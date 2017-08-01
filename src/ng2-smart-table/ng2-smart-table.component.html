@@ -24,10 +24,15 @@
                       (multipleSelectRow)="multipleSelectRow($event)"
                       (rowHover)="onRowHover($event)">
   </tbody>
-
+  <tfoot *ngIf="isPagerDisplay">
+    <tr>
+      <th colspan="5">
+        <ng2-smart-table-pager
+          [source]="source"
+          (changePage)="changePage($event)">
+        </ng2-smart-table-pager>
+      </th>
+    </tr>
+  </tfoot>
 </table>
 
-<ng2-smart-table-pager *ngIf="isPagerDisplay"
-                        [source]="source"
-                        (changePage)="changePage($event)">
-</ng2-smart-table-pager>

@@ -1,0 +1,43 @@
+<div class="ng2-smart-pagination">
+  <div class="tfoot-element left">{{this.source.count()}} item(s) found</div>
+  <div class="tfoot-element center">
+    <ul class="pagination">
+      <li>
+        <a aria-label="First" (click)="getPage() == 1 ? false : paginate(1)">
+                    <span class="pagination-icon first"></span>
+                  </a>
+      </li>
+      <li>
+        <a aria-label="Previous" (click)="getPage() == 1 ? false : paginate(getPreviousPage())">
+                    <span class="pagination-icon previous"></span>
+                  </a>
+      </li>
+      <li>
+        <span>
+                    Page
+                    <select
+                    id="smart-table-pages"
+                    (change)="paginate($event.target.value)">
+                      <option
+                    *ngFor="let pageNumber of this.getPages()"
+                    [attr.value]="pageNumber"
+                    [selected]="pageNumber === getPage()"
+                    >{{ pageNumber }}</option>
+                </select>
+
+                     of {{ getPageCount() }}
+                  </span>
+      </li>
+      <li>
+        <a aria-label="Next" (click)="getPage() == getLast() ? false : paginate(getNextPage())">
+                    <span class="pagination-icon next"></span>
+                  </a>
+      </li>
+      <li>
+        <a aria-label="Last" (click)="getPage() == getLast() ? false : paginate(getLast())">
+                    <span class="pagination-icon last"></span>
+                  </a>
+      </li>
+    </ul>
+  </div>
+</div>
