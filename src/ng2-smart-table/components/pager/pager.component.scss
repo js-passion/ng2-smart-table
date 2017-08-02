@@ -3,6 +3,7 @@
   font-size: .875em;
   padding: 0;
   margin: 0;
+  width: 100%;
 
   .sr-only {
     position: absolute;
@@ -20,5 +21,10 @@
   }
   ul.pagination {
     list-style: none;
+    margin: 0;
+  }
+  .tfoot-element.left {
+    width: 40%;
+    text-align: left;
   }
 }

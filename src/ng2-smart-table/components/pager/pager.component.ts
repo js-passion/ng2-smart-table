@@ -56,7 +56,9 @@ export class PagerComponent implements OnChanges {
   }
 
   shouldShow(): boolean {
-    return this.source.count() > this.perPage;
+    // return this.source.count() > this.perPage;
+    // always show
+    return true;
   }
 
   paginate(page: number): boolean {
