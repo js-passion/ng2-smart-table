@@ -3,16 +3,12 @@ import {Component, Input, Output, EventEmitter, OnChanges, ChangeDetectionStrate
 import { Grid } from '../../../lib/grid';
 import { Row } from '../../../lib/data-set/row';
 import { DataSource } from '../../../lib/data-source/data-source';
+import { Deferred, getDeepFromObject } from '../../../lib/helpers';
 
 @Component({
   selector: 'ng2-st-tbody-edit-delete',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <a href="#" *ngIf="isActionEdit" class="ng2-smart-action ng2-smart-action-edit-edit"
-        [innerHTML]="editRowButtonContent" (click)="onEdit($event)"></a>
-    <a href="#" *ngIf="isActionDelete" class="ng2-smart-action ng2-smart-action-delete-delete"
-        [innerHTML]="deleteRowButtonContent" (click)="onDelete($event)"></a>
-  `,
+  templateUrl: './edit-delete.component.html',
 })
 export class TbodyEditDeleteComponent implements OnChanges {
 
@@ -30,6 +26,7 @@ export class TbodyEditDeleteComponent implements OnChanges {
   isActionDelete: boolean;
   editRowButtonContent: string;
   deleteRowButtonContent: string;
+  action: string = '';
 
   onEdit(event: any) {
     event.preventDefault();
@@ -42,6 +39,20 @@ export class TbodyEditDeleteComponent implements OnChanges {
         data: this.row.getData(),
         source: this.source,
       });
+    } else if (this.grid.getSetting('mode') === 'custom') {
+      const deferred = new Deferred();
+      deferred.promise.then((newData) => {
+        this.grid.edit(this.row);
+      }).catch((err) => {
+        // do nothing
+      });
+      this.edit.emit({
+        index: this.row.index,
+        data: this.row.getData(),
+        source: this.source,
+        edit: deferred,
+      });
+      deferred.resolve();
     } else {
       this.grid.edit(this.row);
     }
@@ -56,12 +67,41 @@ export class TbodyEditDeleteComponent implements OnChanges {
         data: this.row.getData(),
         source: this.source,
       });
+    } else if (this.grid.getSetting('mode') === 'custom') {
+      const deferred = new Deferred();
+      deferred.promise.then((newData) => {
+        this.grid.delete(this.row, this.deleteConfirm);
+      }).catch((err) => {
+        this.row.isDeleted = false;
+      });
+      this.delete.emit({
+        index: this.row.index,
+        data: this.row.getData(),
+        source: this.source,
+        delete: deferred,
+      });
+      deferred.resolve();
     } else {
       this.grid.delete(this.row, this.deleteConfirm);
     }
   }
 
-  ngOnChanges(){
+  onChange(event: any, value: string) {
+    this.row.isDeleted = false;
+    switch (value) {
+      case 'edit':
+        this.onEdit(event);
+        break;
+      case 'delete':
+        this.row.isDeleted = true;
+        this.onDelete(event);
+        break;
+      default:
+        break;
+    }
+    event.target.value = '';
+  }
+  ngOnChanges() {
     this.isActionEdit = this.grid.getSetting('actions.edit');
     this.isActionDelete = this.grid.getSetting('actions.delete');
     this.editRowButtonContent = this.grid.getSetting('edit.editButtonContent');

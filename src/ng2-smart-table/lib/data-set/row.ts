@@ -5,6 +5,7 @@ import { DataSet } from './data-set';
 export class Row {
 
   isSelected: boolean = false;
+  isDeleted: boolean = false;
   isInEditing: boolean = false;
   cells: Array<Cell> = [];
 

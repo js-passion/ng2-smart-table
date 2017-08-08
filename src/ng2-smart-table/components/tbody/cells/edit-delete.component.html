@@ -1,0 +1,5 @@
+<select [(ngModel)]="action" (change)="onChange($event, $event.target.value)">
+    <option value="">Select...</option>
+    <option value="edit">{{editRowButtonContent}}</option>
+    <option value="delete">{{deleteRowButtonContent}}</option>
+</select>    

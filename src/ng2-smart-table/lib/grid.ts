@@ -155,7 +155,11 @@ export class Grid {
 
     const deferred = new Deferred();
     deferred.promise.then(() => {
-      this.source.remove(row.getData());
+      if (this.getSetting('mode') === 'custom') {
+        row.isDeleted = true;
+      } else {
+        this.source.remove(row.getData());
+      }
     }).catch((err) => {
       // doing nothing
     });

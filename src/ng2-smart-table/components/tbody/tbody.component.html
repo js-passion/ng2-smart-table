@@ -1,22 +1,33 @@
-<tr *ngFor="let row of grid.getRows()" (click)="userSelectRow.emit(row)" (mouseover)="rowHover.emit(row)" class="ng2-smart-row" [className]="rowClassFunction(row)" [ngClass]="{selected: row.isSelected}">
+<tr *ngFor="let row of grid.getRows()"
+    (click)="userSelectRow.emit(row)"
+    (mouseover)="rowHover.emit(row)"
+    class="ng2-smart-row"
+    [className]="rowClassFunction(row)"
+    [ngClass]="{selected: row.isSelected, deleted: row.isDeleted}"
+    id="row-{{row.index}}">
   <td *ngIf="isMultiSelectVisible" class="ng2-smart-actions ng2-smart-action-multiple-select" (click)="multipleSelectRow.emit(row)">
     <input type="checkbox" class="form-control" [ngModel]="row.isSelected">
   </td>
-  <td *ngIf="!row.isInEditing && showActionColumnLeft" class="ng2-smart-actions">
+  <td *ngIf="!row.isInEditing && !row.isDeleted && showActionColumnLeft" class="ng2-smart-actions text-center">
     <ng2-st-tbody-custom [grid]="grid" (custom)="custom.emit($event)" [row]="row" [source]="source"></ng2-st-tbody-custom>
 
     <ng2-st-tbody-edit-delete [grid]="grid"
                               [deleteConfirm]="deleteConfirm"
                               [editConfirm]="editConfirm"
-                              (edit)="edit.emit(row)"
-                              (delete)="delete.emit(row)"
+                              (edit)="edit.emit($event)"
+                              (delete)="delete.emit($event)"
                               (editRowSelect)="editRowSelect.emit($event)"
                               [row]="row"
                               [source]="source">
     </ng2-st-tbody-edit-delete>
   </td>
-   <td *ngIf="row.isInEditing && showActionColumnLeft"  class="ng2-smart-actions">
-    <ng2-st-tbody-create-cancel [grid]="grid" [row]="row" [editConfirm]="editConfirm"></ng2-st-tbody-create-cancel>
+   <td *ngIf="(row.isInEditing || row.isDeleted) && showActionColumnLeft"
+    class="ng2-smart-actions text-center">
+    <ng2-st-tbody-create-cancel [grid]="grid"
+                                [row]="row"
+                                [editConfirm]="editConfirm"
+                                (cancelUpdate)="cancelUpdate.emit($event)">
+    </ng2-st-tbody-create-cancel>
   </td>
   <td *ngFor="let cell of row.cells">
     <ng2-smart-table-cell [cell]="cell"
@@ -26,15 +37,20 @@
                           [mode]="mode"
                           [editConfirm]="editConfirm"
                           [inputClass]="editInputClass"
-                          [isInEditing]="row.isInEditing">
+                          [isInEditing]="row.isInEditing"
+                          (edit)="edit.emit($event)">
     </ng2-smart-table-cell>
   </td>
 
-  <td *ngIf="row.isInEditing && showActionColumnRight"  class="ng2-smart-actions">
-    <ng2-st-tbody-create-cancel [grid]="grid" [row]="row" [editConfirm]="editConfirm"></ng2-st-tbody-create-cancel>
+  <td *ngIf="row.isInEditing && showActionColumnRight"  class="ng2-smart-actions text-center">
+    <ng2-st-tbody-create-cancel [grid]="grid"
+                                [row]="row"
+                                [editConfirm]="editConfirm"
+                                (cancelUpdate)="cancelUpdate.emit($event)">
+    </ng2-st-tbody-create-cancel>
   </td>
 
-  <td *ngIf="!row.isInEditing && showActionColumnRight" class="ng2-smart-actions">
+  <td *ngIf="!row.isInEditing && showActionColumnRight" class="ng2-smart-actions text-center">
     <ng2-st-tbody-custom [grid]="grid" (custom)="custom.emit($event)" [row]="row" [source]="source"></ng2-st-tbody-custom>
 
     <ng2-st-tbody-edit-delete [grid]="grid"
@@ -42,8 +58,8 @@
                               [editConfirm]="editConfirm"
                               [row]="row"
                               [source]="source"
-                              (edit)="edit.emit(row)"
-                              (delete)="delete.emit(row)"
+                              (edit)="edit.emit($event)"
+                              (delete)="delete.emit($event)"
                               (editRowSelect)="editRowSelect.emit($event)">
     </ng2-st-tbody-edit-delete>
   </td>

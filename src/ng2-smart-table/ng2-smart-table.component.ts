@@ -26,6 +26,11 @@ export class Ng2SmartTableComponent implements OnChanges {
   @Output() editConfirm = new EventEmitter<any>();
   @Output() createConfirm = new EventEmitter<any>();
   @Output() rowHover: EventEmitter<any> = new EventEmitter<any>();
+  @Output() cancelUpdate = new EventEmitter<any>();
+  @Output() add = new EventEmitter<any>();
+  @Output() cancel = new EventEmitter<any>();
+  @Output() refresh = new EventEmitter<any>();
+  @Output() save = new EventEmitter<any>();
 
   tableClass: string;
   tableId: string;
@@ -33,6 +38,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   isHideSubHeader: boolean;
   isPagerDisplay: boolean;
   rowClassFunction: Function;
+  isBottomAction: boolean;
 
 
   grid: Grid;
@@ -48,6 +54,25 @@ export class Ng2SmartTableComponent implements OnChanges {
       delete: true,
       custom: [],
       position: 'left', // left|right
+    },
+    bottomActions: {
+      enabled: false,
+      add: {
+        enabled: false,
+        content: 'Add'
+      },
+      save: {
+        enabled: false,
+        content: 'Save'
+      },
+      refresh: {
+        enabled: false,
+        content: 'Refresh'
+      },
+      cancel: {
+        enabled: false,
+        content: 'Cancel'
+      }
     },
     filter: {
       inputClass: '',
@@ -101,6 +126,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     this.tableClass = this.grid.getSetting('attr.class');
     this.isHideHeader = this.grid.getSetting('hideHeader');
     this.isHideSubHeader = this.grid.getSetting('hideSubHeader');
+    this.isBottomAction = this.grid.getSetting('bottomActions.enabled');
     this.isPagerDisplay = this.grid.getSetting('pager.display');
     this.rowClassFunction = this.grid.getSetting('rowClassFunction');
   }
@@ -178,6 +204,38 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   filter($event: any) {
     this.resetAllSelector();
+  }
+  getColCount(): number {
+    let count:number = this.grid.getColumns().length;
+
+    if (this.grid.isActionsVisible) {
+      count++;
+    }
+    return count;
+  }
+  /**
+   * TODO: add functionality
+   */
+  onSave() {
+    this.save.emit();
+  }
+  /**
+   * TODO: add functionality
+   */
+  onCancel() {
+    this.cancel.emit();
+  }
+  /**
+   * TODO: add functionality
+   */
+  onRefresh() {
+    this.refresh.emit();
+  }
+  /**
+   * TODO: add functionality
+   */
+  onAdd() {
+    this.add.emit();
   }
 
   private resetAllSelector() {

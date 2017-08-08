@@ -3,12 +3,39 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'basic-example-data',
   template: `
-    <ng2-smart-table [settings]="settings" [source]="data"></ng2-smart-table>
+    <ng2-smart-table
+    [settings]="settings"
+    [source]="data"
+    (delete)="onDelete($event)"
+    (edit)="onEdit($event)"
+    (cancelUpdate)="onCancelUpdate($event)"
+    (add)="onAdd($event)"
+    (save)="onSave($event)"
+    (refresh)="onRefresh($event)"
+    (cancel)="onCancel($event)"
+    (rowSelect)="onRowSelect($event)"
+    ></ng2-smart-table>
   `,
 })
 export class BasicExampleDataComponent {
 
   settings = {
+    actions: {
+      columnTitle: 'Actions',
+      add: false,
+      edit: true,
+      delete: true,
+      custom: [],
+      position: 'left', // left|right
+    },
+    bottomActions: {
+      enabled: true,
+      add: {
+        enabled: true,
+        content: 'Add New',
+      },
+    },
+    mode: 'custom',
     columns: {
       id: {
         title: 'ID',
@@ -92,5 +119,142 @@ export class BasicExampleDataComponent {
       username: 'Nicholas.Stanton',
       email: 'Rey.Padberg@rosamond.biz',
     },
+    {
+      id: 12,
+      name: '12 Nicholas DuBuque',
+      username: '12 Nicholas.Stanton',
+      email: '12Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 13,
+      name: '13Nicholas DuBuque',
+      username: '13Nicholas.Stanton',
+      email: '13Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 14,
+      name: '14Nicholas DuBuque',
+      username: '14Nicholas.Stanton',
+      email: '14Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 15,
+      name: '15Nicholas DuBuque',
+      username: '15Nicholas.Stanton',
+      email: '15Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 16,
+      name: '16Nicholas DuBuque',
+      username: '16Nicholas.Stanton',
+      email: '16Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 17,
+      name: '17Nicholas DuBuque',
+      username: '17Nicholas.Stanton',
+      email: '17Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 18,
+      name: '18Nicholas DuBuque',
+      username: '18Nicholas.Stanton',
+      email: '18Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 19,
+      name: '19Nicholas DuBuque',
+      username: '19Nicholas.Stanton',
+      email: '19Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 20,
+      name: '20Nicholas DuBuque',
+      username: '20Nicholas.Stanton',
+      email: '20Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 21,
+      name: '21Nicholas DuBuque',
+      username: '21Nicholas.Stanton',
+      email: '21Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 22,
+      name: '22Nicholas DuBuque',
+      username: '22Nicholas.Stanton',
+      email: '22Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 23,
+      name: '23Nicholas DuBuque',
+      username: '23Nicholas.Stanton',
+      email: '23Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 24,
+      name: '24Nicholas DuBuque',
+      username: '24Nicholas.Stanton',
+      email: '24Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 25,
+      name: '25Nicholas DuBuque',
+      username: '25Nicholas.Stanton',
+      email: '25Rey.Padberg@rosamond.biz',
+    },
+    {
+      id: 26,
+      name: '26Nicholas DuBuque',
+      username: '26Nicholas.Stanton',
+      email: '26Rey.Padberg@rosamond.biz',
+    },
   ];
+
+  onDelete(event) {
+    console.log(event);
+    if (window.confirm('Are you sure you want to delete?')) {
+      event.delete.resolve();
+    } else {
+      event.delete.reject();
+    }
+  }
+  onEdit(event) {
+    console.log(event);
+    if (event && event.mode === 'edit') {
+      console.log(event.data.name);
+      // do something
+    } else {
+      if (window.confirm('Are you sure you want to Edit?')) {
+        event.edit.resolve();
+      } else {
+        event.edit.reject();
+      }
+    }
+  }
+  onCancelUpdate(event) {
+    console.log(event);
+  }
+
+  onAdd(event) {
+    console.log(event);
+    alert('add clicked');
+  }
+  onCancel(event) {
+    console.log(event);
+    alert('add clicked');
+
+  }
+  onSave(event) {
+    console.log(event);
+    alert('add clicked');
+
+  }
+  onRefresh(event) {
+    console.log(event);
+    alert('add clicked');
+  }
+  onRowSelect(event) {
+    console.log(event);
+  }
 }
