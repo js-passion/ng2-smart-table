@@ -86,6 +86,14 @@ export class PagerComponent implements OnChanges {
   getLast(): number {
     return Math.ceil(this.count / this.perPage);
   }
+  
+  getNextPage(): number {
+    return this.getPage() + 1;
+  }
+  
+  getPreviousPage(): number {
+    return this.getPage() - 1;
+  }
 
   isPageOutOfBounce(): boolean {
     return (this.page * this.perPage) >= (this.count + this.perPage) && this.page > 1;
@@ -93,7 +101,7 @@ export class PagerComponent implements OnChanges {
 
   initPages() {
     const pagesCount = this.getLast();
-    let showPagesCount = 4;
+    let showPagesCount = 400;
     showPagesCount = pagesCount < showPagesCount ? pagesCount : showPagesCount;
     this.pages = [];
 
