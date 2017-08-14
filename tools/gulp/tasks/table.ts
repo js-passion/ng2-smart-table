@@ -41,13 +41,13 @@ task('build:table', sequenceTask(':build:table:bundle:umd'));
 /** Builds components for ng2-smart-table releases */
 task(':build:table:release', sequenceTask(
   ':build:table:bundle:umd',
-  ':build:table:bundle:esm',
+  // ':build:table:bundle:esm',
   ':build:table:ngc',
 ));
 
 /** Builds components typescript in ES5, ES6 target. For specs Karma needs CJS output. */
 task(':build:table:ts:es5', tsBuildTask(tsconfigPath, { target: ScriptTarget.ES5 }));
-task(':build:table:ts:es6', tsBuildTask(tsconfigPath, { target: ScriptTarget.ES2015 }));
+// task(':build:table:ts:es6', tsBuildTask(tsconfigPath, { target: ScriptTarget.ES2015 }));
 task(':build:table:ts:spec', tsBuildTask(tsconfigPath, {
   target: ScriptTarget.ES5, module: ModuleKind.CommonJS,
 }));
@@ -57,9 +57,10 @@ task(':build:table:bundle:umd', sequenceTask(
   ':build:table:ts:es5', ':build:table:inline', ':build:table:rollup:umd',
 ));
 
-task(':build:table:bundle:esm', sequenceTask(
+/* task(':build:table:bundle:esm', sequenceTask(
   ':build:table:ts:es6', ':build:table:inline', ':build:table:rollup:esm',
 ));
+*/
 
 /** Copies all component assets to the build output. */
 task(':build:table:assets', () => {
@@ -72,11 +73,12 @@ task(':build:table:assets', () => {
 task(':build:table:scss', sassBuildTask(TABLE_DIST_ROOT, TABLE_DIR, true));
 
 /** Builds a ES6 bundle for all components. */
-task(':build:table:rollup:esm', () => {
+/* task(':build:table:rollup:esm', () => {
   return src(path.join(TABLE_DIST_ROOT, 'index.js'))
     .pipe(createRollupBundle('es', 'table.js'))
     .pipe(dest(path.join(TABLE_DIST_ROOT, 'bundles')));
 });
+*/
 
 /** Builds a UMD bundle (ES5) for all components. */
 task(':build:table:rollup:umd', () => {
