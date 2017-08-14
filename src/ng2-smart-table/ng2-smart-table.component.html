@@ -49,21 +49,21 @@
             class="btn btn-default"
             (click)="onSave($event)">
             <span class="glyphicon glyphicon-saved"></span>
-            Save
+            {{ grid.getSetting('bottomActions.save.content') }}
           </button>
           <button  *ngIf="grid.getSetting('bottomActions.refresh.enabled')"
             type="button"
             class="btn btn-default"
             (click)="onRefresh($event)">
             <span class="glyphicon glyphicon-refresh"></span>
-            Refresh
+            {{ grid.getSetting('bottomActions.refresh.content') }}
           </button>
           <button  *ngIf="grid.getSetting('bottomActions.cancel.enabled')"
             type="button"
             class="btn btn-secondary"
             (click)="onCancel($event)">
             <span class="glyphicon glyphicon-remove"></span>
-            Cancel
+            {{ grid.getSetting('bottomActions.cancel.content') }}
           </button>
         </div>
       </th>
