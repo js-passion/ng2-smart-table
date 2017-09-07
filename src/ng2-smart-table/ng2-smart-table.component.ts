@@ -3,7 +3,7 @@ import { Component, Input, Output, SimpleChange, EventEmitter, OnChanges } from 
 import { Grid } from './lib/grid';
 import { DataSource } from './lib/data-source/data-source';
 import { Row } from './lib/data-set/row';
-import { deepExtend } from './lib/helpers';
+import { Deferred, deepExtend } from './lib/helpers';
 import { LocalDataSource } from './lib/data-source/local/local.data-source';
 
 @Component({
@@ -31,6 +31,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   @Output() cancel = new EventEmitter<any>();
   @Output() refresh = new EventEmitter<any>();
   @Output() save = new EventEmitter<any>();
+  @Output() changePage = new EventEmitter<any>();
 
   tableClass: string;
   tableId: string;
@@ -62,7 +63,7 @@ export class Ng2SmartTableComponent implements OnChanges {
         content: 'Add'
       },
       save: {
-        enabled: false,
+        enabled: true,
         content: 'Save'
       },
       refresh: {
@@ -109,6 +110,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   };
 
   isAllSelected: boolean = false;
+
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if (this.grid) {
@@ -194,8 +196,18 @@ export class Ng2SmartTableComponent implements OnChanges {
     return deepExtend({}, this.defaultSettings, this.settings);
   }
 
-  changePage($event: any) {
+  OnChangePage(event: any) {
+    const deferred = new Deferred();
     this.resetAllSelector();
+    deferred.promise.then((value) => {
+      this.source.setPage(event.page);
+    }).catch((err) => {
+      // do nothing
+    });
+    this.changePage.emit({
+      changePage: deferred,
+      page: event.page,
+    });
   }
 
   sort($event: any) {
@@ -217,6 +229,7 @@ export class Ng2SmartTableComponent implements OnChanges {
    * TODO: add functionality
    */
   onSave() {
+    const rows = this.grid.getAllRecords();
     this.save.emit();
   }
   /**
@@ -234,8 +247,70 @@ export class Ng2SmartTableComponent implements OnChanges {
   /**
    * TODO: add functionality
    */
-  onAdd() {
-    this.add.emit();
+  onAdd(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+    }).catch((err) => {
+      this.grid.toggleSortingOnCancel();
+      this.grid.toggleFilteringOnCancel();
+      this.grid.enableEditDelete(event.data);
+    });
+    this.add.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      add: deferred,
+    });
+    deferred.resolve();
+  }
+
+  onEdit(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.edit.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      edit: deferred,
+    });
+    deferred.resolve();
+  }
+
+  onDelete(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.delete.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      delete: deferred,
+    });
+    deferred.resolve();
+  }
+
+  onAddCancel(event: any) {
+    this.grid.toggleSortingOnCancel();
+    this.grid.toggleFilteringOnCancel();
+  }
+
+  private onCancelUpdate(event: any) {
+    this.grid.toggleSortingOnCancel();
+    this.grid.toggleFilteringOnCancel();
+    this.cancelUpdate.emit(event);
+    this.grid.deleteNewRow(event.data, event.index);
+    
   }
 
   private resetAllSelector() {

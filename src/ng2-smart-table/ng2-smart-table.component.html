@@ -5,10 +5,10 @@
                       [isAllSelected]="isAllSelected"
                       [source]="source"
                       [createConfirm]="createConfirm"
-                      (create)="create.emit($event)"
+                      (add)="onAdd($event)"
                       (selectAllRows)="onSelectAllRows($event)"
                       (sort)="sort($event)"
-                      (filter)="filter($event)">
+                      (addCancel)="onAddCancel($event)">>
   </thead>
 
   <tbody ng2-st-tbody [grid]="grid"
@@ -16,21 +16,21 @@
                       [deleteConfirm]="deleteConfirm"
                       [editConfirm]="editConfirm"
                       [rowClassFunction]="rowClassFunction"
-                      (edit)="edit.emit($event)"
-                      (delete)="delete.emit($event)"
+                      (edit)="onEdit($event)"
+                      (delete)="onDelete($event)"
                       (custom)="custom.emit($event)"
                       (userSelectRow)="onUserSelectRow($event)"
                       (editRowSelect)="editRowSelect($event)"
                       (multipleSelectRow)="multipleSelectRow($event)"
                       (rowHover)="onRowHover($event)"
-                      (cancelUpdate)="cancelUpdate.emit($event)">
+                      (cancelUpdate)="onCancelUpdate($event)">
   </tbody>
   <tfoot *ngIf="isPagerDisplay || isBottomAction">
     <tr>
       <th attr.colspan="{{ getColCount() }}">
         <ng2-smart-table-pager
           [source]="source"
-          (changePage)="changePage($event)">
+          (changePage)="OnChangePage($event)">
         </ng2-smart-table-pager>
       </th>
     </tr>

@@ -14,6 +14,7 @@ import { Component } from '@angular/core';
     (refresh)="onRefresh($event)"
     (cancel)="onCancel($event)"
     (rowSelect)="onRowSelect($event)"
+    (changePage)="onChangePage($event)"
     ></ng2-smart-table>
   `,
 })
@@ -22,7 +23,7 @@ export class BasicExampleDataComponent {
   settings = {
     actions: {
       columnTitle: 'Actions',
-      add: false,
+      add: true,
       edit: true,
       delete: true,
       custom: [],
@@ -1973,4 +1974,13 @@ export class BasicExampleDataComponent {
   onRowSelect(event) {
     console.log(event);
   }
+
+  onChangePage(event) {
+    if (window.confirm('Are you sure you want to Navigate?')) {
+      event.changePage.resolve();
+    } else {
+      event.changePage.reject();
+    }
+  }
+
 }

@@ -14,7 +14,7 @@ export class AddButtonComponent implements AfterViewInit, OnChanges {
 
   @Input() grid: Grid;
   @Input() source: DataSource;
-  @Output() create = new EventEmitter<any>();
+  @Output() add = new EventEmitter<any>();
 
   isActionAdd: boolean;
   addNewButtonContent: string;
@@ -34,12 +34,12 @@ export class AddButtonComponent implements AfterViewInit, OnChanges {
   onAdd(event: any) {
     event.preventDefault();
     event.stopPropagation();
-    if (this.grid.getSetting('mode') === 'external') {
-      this.create.emit({
-        source: this.source,
-      });
-    } else {
-      this.grid.createFormShown = true;
+    this.add.emit({
+      source: this.source,
+    });
+    const lastRow = this.grid.getLastRow();
+    if (!lastRow.isDeleted && !lastRow.isInEditing) {
+      this.grid.create(this.grid.getNewRow(), this.add);
     }
   }
 }

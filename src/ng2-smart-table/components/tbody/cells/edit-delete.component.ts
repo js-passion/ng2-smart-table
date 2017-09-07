@@ -70,6 +70,7 @@ export class TbodyEditDeleteComponent implements OnChanges {
     } else if (this.grid.getSetting('mode') === 'custom') {
       const deferred = new Deferred();
       deferred.promise.then((newData) => {
+        this.row.isDeleted = true;
         this.grid.delete(this.row, this.deleteConfirm);
       }).catch((err) => {
         this.row.isDeleted = false;
@@ -93,7 +94,6 @@ export class TbodyEditDeleteComponent implements OnChanges {
         this.onEdit(event);
         break;
       case 'delete':
-        this.row.isDeleted = true;
         this.onDelete(event);
         break;
       default:

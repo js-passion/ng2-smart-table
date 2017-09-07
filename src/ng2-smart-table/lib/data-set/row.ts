@@ -7,6 +7,8 @@ export class Row {
   isSelected: boolean = false;
   isDeleted: boolean = false;
   isInEditing: boolean = false;
+  action: string = '';
+  isNewRow : boolean = false;
   cells: Array<Cell> = [];
 
 

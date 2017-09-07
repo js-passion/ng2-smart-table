@@ -15,6 +15,7 @@ export class Grid {
   source: DataSource;
   settings: any;
   dataSet: DataSet;
+  deletedIndex: number;
 
   onSelectRowSource = new Subject<any>();
 
@@ -43,6 +44,70 @@ export class Grid {
     return this.dataSet.newRow;
   }
 
+
+
+  toggleSorting(toggleOn: boolean) {
+    const columns = this.dataSet.getColumns();
+    for (const column of columns) {
+      if (toggleOn) {
+        column.isSortable = true;
+      } else {
+        column.isSortable = false;
+      }
+    }
+  }
+
+  toggleFiltering(toggleOn: boolean) {
+    const columns = this.dataSet.getColumns();
+    for (const column of columns) {
+      if (toggleOn) {
+        column.isFilterable = true;
+      } else {
+        column.isFilterable = false;
+      }
+    }
+  }
+
+  toggleFilteringOnCancel() {
+    let rows = [];
+    const page = this.source.getPaging().page;
+    const perPage = this.source.getPaging().perPage;
+    rows = this.dataSet.getRows().slice(0, 10);
+    let isEditable = false;
+    for (const row of rows) {
+      if (row.isDeleted || row.isInEditing) {
+        isEditable = true;
+      }
+    }
+    if (!isEditable) {
+      this.toggleFiltering(true);
+    }
+  }
+
+  toggleSortingOnCancel() {
+    let rows = [];
+    const page = this.source.getPaging().page;
+    const perPage = this.source.getPaging().perPage;
+    rows = this.dataSet.getRows().slice(0, 10);
+    let isEditable = false;
+    for (const row of rows) {
+      if (row.isDeleted || row.isInEditing) {
+        isEditable = true;
+      }
+    }
+    if (!isEditable) {
+      this.toggleSorting(true);
+    }
+
+  }
+
+  enableEditDelete(data: Object) {
+    const row = this.dataSet.findRowByData(data);
+    this.dataSet.findRowByData(data).isDeleted = false;
+    this.dataSet.findRowByData(data).isInEditing = false;
+    this.settings.actions.delete = false;
+  }
+
   setSettings(settings: Object) {
     this.settings = settings;
     this.dataSet = new DataSet([], this.getSetting('columns'));
@@ -54,6 +119,34 @@ export class Grid {
 
   getDataSet(): DataSet {
     return this.dataSet;
+  }
+
+  getAllRecords(): any[] {
+    let rows = this.getRows();
+    let records: any[] = [];
+    let pushRecord = false;
+    for (let row of rows) {
+      let record = {
+        data: {},
+        action: ''
+      };
+      if (row.isDeleted) {
+        record.action = 'DELETE';
+        pushRecord = true;
+      } else if (row.isInEditing && !row.isNewRow) {
+        record.action = 'EDIT';
+        pushRecord = true;
+      } else if (row.isNewRow) {
+        record.action = 'ADD';
+        pushRecord = true;
+      }
+      if (pushRecord) {
+        record.data = row.getNewData();
+        records.push(record);
+      }
+      pushRecord = false;
+    }
+    return records;
   }
 
   setSource(source: DataSource) {
@@ -103,10 +196,8 @@ export class Grid {
       if (deferred.resolve.skipAdd) {
         this.createFormShown = false;
       } else {
-        this.source.prepend(newData).then(() => {
-          this.createFormShown = false;
-          this.dataSet.createNewRow();
-        });
+        this.source.prepend(newData).then(() => this.createFormShown = false
+        )
       }
     }).catch((err) => {
       // doing nothing
@@ -151,13 +242,18 @@ export class Grid {
     }
   }
 
+  deleteNewRow(data: any, index: any) {
+    let row = this.dataSet.findRowByData(data);
+    if (row.isNewRow) {
+      this.source.remove(row.getData());
+      this.deletedIndex = index;
+    }
+  }
   delete(row: Row, confirmEmitter: EventEmitter<any>) {
 
     const deferred = new Deferred();
     deferred.promise.then(() => {
-      if (this.getSetting('mode') === 'custom') {
-        row.isDeleted = true;
-      } else {
+      if (this.getSetting('mode') !== 'custom') {
         this.source.remove(row.getData());
       }
     }).catch((err) => {
@@ -176,13 +272,49 @@ export class Grid {
   }
 
   processDataChange(changes: any) {
+    let event = changes;
+    let index = 0;
     if (this.shouldProcessChange(changes)) {
+      const rows = this.dataSet.getRows().slice(0, 10);
       this.dataSet.setData(changes['elements']);
+      const newRows = this.dataSet.getRows().slice(0, 10);
+      if (['remove'].indexOf(changes['action']) !== -1) {
+        let oldIndex = 0;
+        // restore old status of rows because when data set changes new rows are created 
+        // from scratch and we lose the old status, hence copying the old status into newly created rows.
+        for (let index = 0; index < 9; index++) {
+          if (oldIndex === this.deletedIndex) {
+            oldIndex = oldIndex + 1;
+          }
+          newRows[index].isDeleted = rows[oldIndex].isDeleted;
+          newRows[index].isInEditing = rows[oldIndex].isInEditing;
+          newRows[index].isNewRow = rows[oldIndex].isNewRow;
+          oldIndex++;
+        }
+      } else {
+        if ((newRows.length > 0) && (rows.length > 0)) {
+          // restore old status of rows because when data set changes new rows are created 
+          // from scratch and we lose the old status, hence copying the old status into newly created rows.
+          while (index < 9) {
+            if (newRows[index + 1].isNewRow) {
+              newRows[index + 1].isInEditing = true;
+            }
+            newRows[index + 1].isDeleted = rows[index].isDeleted;
+            if (newRows[index + 1].isDeleted) {
+              this.settings.actions.delete = true;
+            }
+            newRows[index + 1].isInEditing = rows[index].isInEditing;
+            newRows[index + 1].isNewRow = rows[index].isNewRow;
+            index++;
+          }
+          newRows[0].isInEditing = true;
+          newRows[0].isNewRow = true;
+        }
+      }
       if (this.getSetting('selectMode') !== 'multi') {
         const row = this.determineRowToSelect(changes);
-
         if (row) {
-          this.onSelectRowSource.next(row);
+          this.onSelectRowSource.next(newRows[0]);
         }
       }
     }
@@ -194,7 +326,6 @@ export class Grid {
     } else if (['prepend', 'append'].indexOf(changes['action']) !== -1 && !this.getSetting('pager.display')) {
       return true;
     }
-
     return false;
   }
 
