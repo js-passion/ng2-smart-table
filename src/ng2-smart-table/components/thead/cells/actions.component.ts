@@ -30,6 +30,7 @@ export class ActionsComponent implements OnChanges {
   onAddCancel(event : any) {
     event.preventDefault();
     this.grid.createFormShown = false;
+    this.grid.dataSet.newRowValidator.reset();
     this.addCancel.emit();
   }
 }

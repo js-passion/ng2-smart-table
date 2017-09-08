@@ -5,6 +5,7 @@ import { DataSource } from './lib/data-source/data-source';
 import { Row } from './lib/data-set/row';
 import { Deferred, deepExtend } from './lib/helpers';
 import { LocalDataSource } from './lib/data-source/local/local.data-source';
+import { ValidatorService } from './lib/validator.service';
 
 @Component({
   selector: 'ng2-smart-table',
@@ -41,6 +42,8 @@ export class Ng2SmartTableComponent implements OnChanges {
   rowClassFunction: Function;
   isBottomAction: boolean;
 
+  constructor(private validator: ValidatorService) { }
+
 
   grid: Grid;
   defaultSettings: Object = {
@@ -50,7 +53,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     hideSubHeader: false,
     actions: {
       columnTitle: 'Actions',
-      add: true,
+      add: false,
       edit: true,
       delete: true,
       custom: [],
@@ -63,7 +66,7 @@ export class Ng2SmartTableComponent implements OnChanges {
         content: 'Add'
       },
       save: {
-        enabled: true,
+        enabled: false,
         content: 'Save'
       },
       refresh: {
@@ -115,7 +118,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if (this.grid) {
       if (changes['settings']) {
-        this.grid.setSettings(this.prepareSettings());
+        this.grid.setSettings(this.prepareSettings(), this.validator);
       }
       if (changes['source']) {
         this.source = this.prepareSource();
@@ -178,7 +181,7 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   initGrid() {
     this.source = this.prepareSource();
-    this.grid = new Grid(this.source, this.prepareSettings());
+    this.grid = new Grid(this.source, this.prepareSettings(), this.validator);
     this.grid.onSelectRow().subscribe((row) => this.emitSelectRow(row));
   }
 
