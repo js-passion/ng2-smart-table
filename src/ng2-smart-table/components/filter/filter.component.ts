@@ -33,6 +33,7 @@ import { Subscription } from 'rxjs/Subscription';
                     [column]="column"
                     (filter)="onFilter($event)">
       </input-filter>
+    
     </div>
   `,
 })

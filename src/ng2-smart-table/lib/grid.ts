@@ -46,6 +46,32 @@ export class Grid {
   }
 
 
+  toggleCheckBoxOnCancel() {
+    let rows = [];
+    const page = this.source.getPaging().page;
+    const perPage = this.source.getPaging().perPage;
+    rows = this.dataSet.getRows().slice(0, 10);
+    let isEditable = false;
+    for (const row of rows) {
+      if (row.isDeleted || row.isInEditing || row.isReissued || row.isRevoked || row.isUndo) {
+        isEditable = true;
+      }
+    }
+    if (!isEditable) {
+      for (const row of rows) {
+        row.disableCheckBox = false;
+      }
+    }
+
+  }
+  disableCheckBoxes() {
+    const rows = this.dataSet.getRows().slice(0, 10);
+    for (let row of rows) {
+      row.isSelected = false;
+      row.disableCheckBox = true;
+    }
+  }
+
 
   toggleSorting(toggleOn: boolean) {
     const columns = this.dataSet.getColumns();
@@ -76,7 +102,7 @@ export class Grid {
     rows = this.dataSet.getRows().slice(0, 10);
     let isEditable = false;
     for (const row of rows) {
-      if (row.isDeleted || row.isInEditing) {
+      if (row.isDeleted || row.isInEditing || row.isReissued || row.isRevoked || row.isUndo) {
         isEditable = true;
       }
     }
@@ -92,7 +118,7 @@ export class Grid {
     rows = this.dataSet.getRows().slice(0, 10);
     let isEditable = false;
     for (const row of rows) {
-      if (row.isDeleted || row.isInEditing) {
+      if (row.isDeleted || row.isInEditing || row.isReissued || row.isRevoked || row.isUndo) {
         isEditable = true;
       }
     }
@@ -106,6 +132,10 @@ export class Grid {
     const row = this.dataSet.findRowByData(data);
     this.dataSet.findRowByData(data).isDeleted = false;
     this.dataSet.findRowByData(data).isInEditing = false;
+    this.dataSet.findRowByData(data).isReissued = false;
+    this.dataSet.findRowByData(data).isRevoked = false;
+    this.dataSet.findRowByData(data).isUndo = false;
+    row.disableCheckBox = false;
     this.settings.actions.delete = false;
   }
 
@@ -214,7 +244,7 @@ export class Grid {
         validator: this.dataSet.newRowValidator,
       });
     } else {
-      if(this.dataSet.newRowValidator.invalid)
+      if (this.dataSet.newRowValidator.invalid)
         deferred.reject();
       else
         deferred.resolve();
@@ -247,7 +277,7 @@ export class Grid {
         validator: this.dataSet.newRowValidator,
       });
     } else {
-      if(this.dataSet.newRowValidator.invalid)
+      if (this.dataSet.newRowValidator.invalid)
         deferred.reject();
       else
         deferred.resolve();
@@ -301,6 +331,11 @@ export class Grid {
           }
           newRows[index].isDeleted = rows[oldIndex].isDeleted;
           newRows[index].isInEditing = rows[oldIndex].isInEditing;
+          newRows[index].isReissued = rows[oldIndex].isReissued;
+          newRows[index].isRevoked = rows[oldIndex].isRevoked;
+          newRows[index].isUndo = rows[oldIndex].isUndo;
+          newRows[index].isSelected = rows[index].isSelected;
+          newRows[index].disableCheckBox = rows[oldIndex].disableCheckBox;
           newRows[index].isNewRow = rows[oldIndex].isNewRow;
           oldIndex++;
         }
@@ -318,10 +353,18 @@ export class Grid {
             }
             newRows[index + 1].isInEditing = rows[index].isInEditing;
             newRows[index + 1].isNewRow = rows[index].isNewRow;
+            newRows[index + 1].isReissued = rows[index].isReissued;
+            newRows[index + 1].isRevoked = rows[index].isRevoked;
+            newRows[index + 1].isUndo = rows[index].isUndo;
+            newRows[index + 1].isSelected = rows[index].isSelected;
+            newRows[index + 1].disableCheckBox = rows[index].disableCheckBox;
+
             index++;
           }
           newRows[0].isInEditing = true;
           newRows[0].isNewRow = true;
+          newRows[0].disableCheckBox = true;
+          newRows[0].isSelected = false;
         }
       }
       if (this.getSetting('selectMode') !== 'multi') {

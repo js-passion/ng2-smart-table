@@ -17,7 +17,6 @@ export class Cell {
   }
 
   getValidator(): AbstractControl {
-    const val = console.log(this.dataSet.getRowValidator(0));
     if(this.dataSet.getRowValidator(this.getRow().index))
     return this.dataSet.getRowValidator(this.getRow().index).controls[this.getId()];
   }

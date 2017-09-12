@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnChanges, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 
 import { Grid } from '../../../lib/grid';
 import { Row } from '../../../lib/data-set/row';
@@ -21,11 +21,17 @@ export class TbodyEditDeleteComponent implements OnChanges {
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() editRowSelect = new EventEmitter<any>();
+  @Output() revoke = new EventEmitter<any>();
+  @Output() undo = new EventEmitter<any>();
+  @Output() reissue = new EventEmitter<any>();
 
   isActionEdit: boolean;
   isActionDelete: boolean;
   editRowButtonContent: string;
   deleteRowButtonContent: string;
+  revokeRowButtonContent: string;
+  undoRowButtonContent: string;
+  reissueRowButtonContent: string;
   action: string = '';
 
   onEdit(event: any) {
@@ -87,6 +93,40 @@ export class TbodyEditDeleteComponent implements OnChanges {
     }
   }
 
+  onRevoke(event: any) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.row.isRevoked = true;
+    this.revoke.emit({
+      index: this.row.index,
+      data: this.row.getData(),
+      source: this.source,
+    });
+  }
+
+
+  onUndo(event: any) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.row.isUndo = true;
+    this.undo.emit({
+      index: this.row.index,
+      data: this.row.getData(),
+      source: this.source,
+    });
+  }
+
+  onReissue(event: any) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.row.isReissued = true;
+    this.reissue.emit({
+      index: this.row.index,
+      data: this.row.getData(),
+      source: this.source,
+    });
+  }
+
   onChange(event: any, value: string) {
     this.row.isDeleted = false;
     switch (value) {
@@ -95,6 +135,15 @@ export class TbodyEditDeleteComponent implements OnChanges {
         break;
       case 'delete':
         this.onDelete(event);
+        break;
+      case 'revoke':
+        this.onRevoke(event);
+        break;
+      case 'undo':
+        this.onUndo(event);
+        break;
+      case 'reissue':
+        this.onReissue(event);
         break;
       default:
         break;
@@ -106,5 +155,8 @@ export class TbodyEditDeleteComponent implements OnChanges {
     this.isActionDelete = this.grid.getSetting('actions.delete');
     this.editRowButtonContent = this.grid.getSetting('edit.editButtonContent');
     this.deleteRowButtonContent = this.grid.getSetting('delete.deleteButtonContent');
+    this.revokeRowButtonContent = this.grid.getSetting('revoke.revokeButtonContent');
+    this.undoRowButtonContent = this.grid.getSetting('undo.undoButtonContent');
+    this.reissueRowButtonContent = this.grid.getSetting('reissue.reissueButtonContent');
   }
 }

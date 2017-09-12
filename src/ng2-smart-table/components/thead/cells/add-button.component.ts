@@ -6,8 +6,8 @@ import { DataSource } from '../../../lib/data-source/data-source';
 @Component({
   selector: '[ng2-st-add-button]',
   template: `
-    <a *ngIf="isActionAdd" href="#" class="ng2-smart-action ng2-smart-action-add-add"
-        [innerHTML]="addNewButtonContent" (click)="onAdd($event)"></a>
+    <button *ngIf="isActionAdd"  class="ng2-smart-action ng2-smart-action-add-add" type="button"
+        [innerHTML]="addNewButtonContent" (click)="onAdd($event)"></button>
   `,
 })
 export class AddButtonComponent implements AfterViewInit, OnChanges {

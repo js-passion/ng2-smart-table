@@ -33,6 +33,15 @@ export class Ng2SmartTableComponent implements OnChanges {
   @Output() refresh = new EventEmitter<any>();
   @Output() save = new EventEmitter<any>();
   @Output() changePage = new EventEmitter<any>();
+  @Output() revoke = new EventEmitter<any>();
+  @Output() undo = new EventEmitter<any>();
+  @Output() reissue = new EventEmitter<any>();
+  @Output() clear = new EventEmitter<any>();
+  @Output() deleteAll = new EventEmitter<any>();
+  @Output() transfer = new EventEmitter<any>();
+  @Output() createPrtSet = new EventEmitter<any>();
+  @Output() linkToPrtSet = new EventEmitter<any>();
+  @Output() back = new EventEmitter<any>();
 
   tableClass: string;
   tableId: string;
@@ -48,7 +57,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   grid: Grid;
   defaultSettings: Object = {
     mode: 'inline', // inline|external|click-to-edit
-    selectMode: 'single', // single|multi
+    selectMode: 'multi', // single|multi
     hideHeader: false,
     hideSubHeader: false,
     actions: {
@@ -76,7 +85,31 @@ export class Ng2SmartTableComponent implements OnChanges {
       cancel: {
         enabled: false,
         content: 'Cancel'
-      }
+      },
+      clear: {
+        enabled: false,
+        content: 'Clear'
+      },
+      deleteAll: {
+        enabled: false,
+        content: 'Delete All'
+      },
+      transfer: {
+        enabled: false,
+        content: 'Transfer'
+      },
+      createPrtSet: {
+        enabled: false,
+        content: 'Create PrtSet'
+      },
+      linkToPrtSet: {
+        enabled: false,
+        content: 'Link To PrtSet'
+      },
+      back: {
+        enabled: false,
+        content: 'Back'
+      },
     },
     filter: {
       inputClass: '',
@@ -90,7 +123,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     },
     add: {
       inputClass: '',
-      addButtonContent: 'Add New',
+      addButtonContent: '<span class="glyphicon glyphicon-plus"></span>',
       createButtonContent: 'Create',
       cancelButtonContent: 'Cancel',
       confirmCreate: false,
@@ -99,6 +132,19 @@ export class Ng2SmartTableComponent implements OnChanges {
       deleteButtonContent: 'Delete',
       confirmDelete: false,
     },
+    revoke: {
+      revokeButtonContent: 'Revoke',
+      cancelButtonContent: 'Cancel',
+    },
+    undo: {
+      undoButtonContent: 'Undo',
+      cancelButtonContent: 'Cancel',
+    },
+    reissue : {
+      reissueButtonContent: 'Reissue',
+      cancelButtonContent: 'Cancel',
+    },
+
     attr: {
       id: '',
       class: '',
@@ -221,9 +267,12 @@ export class Ng2SmartTableComponent implements OnChanges {
     this.resetAllSelector();
   }
   getColCount(): number {
-    let count:number = this.grid.getColumns().length;
+    let count: number = this.grid.getColumns().length;
 
     if (this.grid.isActionsVisible) {
+      count++;
+    }
+    if (this.grid.isMultiSelectVisible) {
       count++;
     }
     return count;
@@ -255,6 +304,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     deferred.promise.then((value) => {
       this.grid.toggleSorting(false);
       this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
     }).catch((err) => {
       this.grid.toggleSortingOnCancel();
       this.grid.toggleFilteringOnCancel();
@@ -274,6 +324,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     deferred.promise.then((value) => {
       this.grid.toggleSorting(false);
       this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
     }).catch((err) => {
       this.grid.enableEditDelete(event.data);
     });
@@ -291,6 +342,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     deferred.promise.then((value) => {
       this.grid.toggleSorting(false);
       this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
     }).catch((err) => {
       this.grid.enableEditDelete(event.data);
     });
@@ -303,6 +355,166 @@ export class Ng2SmartTableComponent implements OnChanges {
     deferred.resolve();
   }
 
+  //TODO
+  onUndo(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.undo.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      undo: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onRevoke(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.revoke.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      revoke: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onReissue(event : any){
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.reissue.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      reissue: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onClear(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.clear.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      clear: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onDeleteAll(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.deleteAll.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      deleteAll: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onTransfer(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.transfer.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      transfer: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onBack(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.back.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      back: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onLinkToPrtSet(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.linkToPrtSet.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      linkToPrtSet: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onCreatePrtSet(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.createPrtSet.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      createPrtSet: deferred,
+    });
+    deferred.resolve();
+  }
+
+
   onAddCancel(event: any) {
     this.grid.toggleSortingOnCancel();
     this.grid.toggleFilteringOnCancel();
@@ -311,9 +523,10 @@ export class Ng2SmartTableComponent implements OnChanges {
   private onCancelUpdate(event: any) {
     this.grid.toggleSortingOnCancel();
     this.grid.toggleFilteringOnCancel();
+    this.grid.toggleCheckBoxOnCancel();
     this.cancelUpdate.emit(event);
     this.grid.deleteNewRow(event.data, event.index);
-    
+
   }
 
   private resetAllSelector() {

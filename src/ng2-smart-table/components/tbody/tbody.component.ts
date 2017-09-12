@@ -29,6 +29,9 @@ export class Ng2SmartTableTbodyComponent {
   @Output() multipleSelectRow = new EventEmitter<any>();
   @Output() rowHover = new EventEmitter<any>();
   @Output() cancelUpdate = new EventEmitter<any>();
+  @Output() revoke = new EventEmitter<any>();
+  @Output() undo = new EventEmitter<any>();
+  @Output() reissue = new EventEmitter<any>();
 
   isMultiSelectVisible: boolean;
   showActionColumnLeft: boolean;

@@ -1,73 +1,66 @@
 <table [id]="tableId" [ngClass]="tableClass">
 
-  <thead ng2-st-thead *ngIf="!isHideHeader || !isHideSubHeader"
-                      [grid]="grid"
-                      [isAllSelected]="isAllSelected"
-                      [source]="source"
-                      [createConfirm]="createConfirm"
-                      (add)="onAdd($event)"
-                      (selectAllRows)="onSelectAllRows($event)"
-                      (sort)="sort($event)"
-                      (addCancel)="onAddCancel($event)">>
+  <thead ng2-st-thead *ngIf="!isHideHeader || !isHideSubHeader" [grid]="grid" [isAllSelected]="isAllSelected" [source]="source"
+    [createConfirm]="createConfirm" (add)="onAdd($event)" (selectAllRows)="onSelectAllRows($event)" (sort)="sort($event)" (addCancel)="onAddCancel($event)">>
   </thead>
 
-  <tbody ng2-st-tbody [grid]="grid"
-                      [source]="source"
-                      [deleteConfirm]="deleteConfirm"
-                      [editConfirm]="editConfirm"
-                      [rowClassFunction]="rowClassFunction"
-                      (edit)="onEdit($event)"
-                      (delete)="onDelete($event)"
-                      (custom)="custom.emit($event)"
-                      (userSelectRow)="onUserSelectRow($event)"
-                      (editRowSelect)="editRowSelect($event)"
-                      (multipleSelectRow)="multipleSelectRow($event)"
-                      (rowHover)="onRowHover($event)"
-                      (cancelUpdate)="onCancelUpdate($event)">
+  <tbody ng2-st-tbody [grid]="grid" [source]="source" [deleteConfirm]="deleteConfirm" [editConfirm]="editConfirm" [rowClassFunction]="rowClassFunction"
+    (edit)="onEdit($event)" (delete)="onDelete($event)" (revoke)="onRevoke($event)" (undo)="onUndo($event)" (reissue)="onReissue($event)" (custom)="custom.emit($event)" (userSelectRow)="onUserSelectRow($event)"
+    (editRowSelect)="editRowSelect($event)" (multipleSelectRow)="multipleSelectRow($event)" (rowHover)="onRowHover($event)"
+    (cancelUpdate)="onCancelUpdate($event)">
   </tbody>
   <tfoot *ngIf="isPagerDisplay || isBottomAction">
     <tr>
       <th attr.colspan="{{ getColCount() }}">
-        <ng2-smart-table-pager
-          [source]="source"
-          (changePage)="OnChangePage($event)">
+        <ng2-smart-table-pager [source]="source" (changePage)="OnChangePage($event)">
         </ng2-smart-table-pager>
       </th>
     </tr>
     <tr *ngIf="isBottomAction">
       <th attr.colspan="{{ getColCount() }}" class="text-right">
         <div class="btn-group pull-right" role="group">
-          <button *ngIf="grid.getSetting('bottomActions.add.enabled')"
-            type="button"
-            class="btn btn-default"
-            (click)="onAdd($event)">
+          <button *ngIf="grid.getSetting('bottomActions.add.enabled')" type="button" (click)="onAdd($event)">
             <span class="glyphicon glyphicon-plus"></span>
-            {{ grid.getSetting('bottomActions.add.content') }}
+           
           </button>
-          <button  *ngIf="grid.getSetting('bottomActions.save.enabled')"
-            type="button"
-            class="btn btn-default"
-            (click)="onSave($event)">
+          <button *ngIf="grid.getSetting('bottomActions.save.enabled')" type="button" class="btn btn-default" (click)="onSave($event)">
             <span class="glyphicon glyphicon-saved"></span>
             {{ grid.getSetting('bottomActions.save.content') }}
           </button>
-          <button  *ngIf="grid.getSetting('bottomActions.refresh.enabled')"
-            type="button"
-            class="btn btn-default"
-            (click)="onRefresh($event)">
+          <button *ngIf="grid.getSetting('bottomActions.refresh.enabled')" type="button" class="btn btn-default" (click)="onRefresh($event)">
             <span class="glyphicon glyphicon-refresh"></span>
             {{ grid.getSetting('bottomActions.refresh.content') }}
           </button>
-          <button  *ngIf="grid.getSetting('bottomActions.cancel.enabled')"
-            type="button"
-            class="btn btn-secondary"
-            (click)="onCancel($event)">
+          <button *ngIf="grid.getSetting('bottomActions.cancel.enabled')" type="button" class="btn btn-secondary" (click)="onCancel($event)">
             <span class="glyphicon glyphicon-remove"></span>
             {{ grid.getSetting('bottomActions.cancel.content') }}
           </button>
+          <button *ngIf="grid.getSetting('bottomActions.clear.enabled')" type="button" class="btn btn-secondary" (click)="onClear($event)">
+          <span class="glyphicon glyphicon-remove"></span>
+          {{ grid.getSetting('bottomActions.clear.content') }}
+        </button>
+          <button *ngIf="grid.getSetting('bottomActions.deleteAll.enabled')" type="button" class="btn btn-secondary" (click)="onDeleteAll($event)">
+        <span class="glyphicon glyphicon-remove"></span>
+        {{ grid.getSetting('bottomActions.deleteAll.content') }}
+      </button>
+          <button *ngIf="grid.getSetting('bottomActions.transfer.enabled')" type="button" class="btn btn-secondary" (click)="onTransfer($event)">
+      <span class="glyphicon glyphicon-remove"></span>
+      {{ grid.getSetting('bottomActions.transfer.content') }}
+    </button>
+          <button *ngIf="grid.getSetting('bottomActions.createPrtSet.enabled')" type="button" class="btn btn-secondary" (click)="onCreatePrtSet($event)">
+      <span class="glyphicon glyphicon-remove"></span>
+      {{ grid.getSetting('bottomActions.createPrtSet.content') }}
+    </button>
+          <button *ngIf="grid.getSetting('bottomActions.linkToPrtSet.enabled')" type="button" class="btn btn-secondary" (click)="onLinkToPrtSet($event)">
+      <span class="glyphicon glyphicon-remove"></span>
+      {{ grid.getSetting('bottomActions.linkToPrtSet.content') }}
+    </button>
+    <button *ngIf="grid.getSetting('bottomActions.back.enabled')" type="button" class="btn btn-secondary" (click)="onBack($event)">
+      <span class="glyphicon glyphicon-remove"></span>
+      {{ grid.getSetting('bottomActions.back.content') }}
+    </button>
         </div>
       </th>
     </tr>
   </tfoot>
 </table>
-

@@ -63,12 +63,14 @@ export class DataSet {
   getLastRow(): Row {
     return this.rows[this.rows.length - 1];
   }
-
+  
   getRowValidator(index: number): FormGroup {
+
     if (index === -1)
       return this.newRowValidator;
-    else
+    else{
       return this.editRowValidators[index] as FormGroup;
+    }
   }
 
   findRowByData(data: any): Row {
