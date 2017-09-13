@@ -7,6 +7,13 @@ export class Row {
   isSelected: boolean = false;
   isDeleted: boolean = false;
   isInEditing: boolean = false;
+  isUndo : boolean = false;
+  isReissued : boolean = false;
+  isRevoked : boolean = false;
+  action: string = '';
+  isNewRow : boolean = false;
+  disableCheckBox : boolean = false;
+  checked : boolean = false;
   cells: Array<Cell> = [];
 
 

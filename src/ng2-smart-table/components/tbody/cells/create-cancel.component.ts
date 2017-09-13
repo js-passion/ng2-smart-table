@@ -37,6 +37,9 @@ export class TbodyCreateCancelComponent implements OnChanges {
 
     this.row.isInEditing = false;
     this.row.isDeleted = false;
+    this.row.isReissued = false;
+    this.row.isRevoked = false;
+    this.row.isUndo = false;
 
     if (this.grid.getSetting('mode') === 'custom') {
       this.cancelUpdate.emit({

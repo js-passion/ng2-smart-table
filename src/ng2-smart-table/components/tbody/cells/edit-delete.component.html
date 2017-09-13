@@ -1,5 +1,8 @@
 <select [(ngModel)]="action" (change)="onChange($event, $event.target.value)">
     <option value="">Select...</option>
-    <option value="edit">{{editRowButtonContent}}</option>
-    <option value="delete">{{deleteRowButtonContent}}</option>
+    <option *ngIf ="isActionEdit"    value="edit">    {{editRowButtonContent}}</option>
+    <option *ngIf ="isActionDelete"  value="delete">  {{deleteRowButtonContent}}</option>
+    <option *ngIf ="isActionRevoked"  value="revoke">  {{revokeRowButtonContent}}</option>
+    <option *ngIf ="isActionUndo"    value="undo">    {{undoRowButtonContent}}</option>
+    <option *ngIf ="isActionReissue" value="reissue"> {{reissueRowButtonContent}}</option>
 </select>    

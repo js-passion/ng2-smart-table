@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { Validators } from '@angular/forms';
 @Component({
   selector: 'basic-example-data',
   template: `
@@ -13,7 +13,17 @@ import { Component } from '@angular/core';
     (save)="onSave($event)"
     (refresh)="onRefresh($event)"
     (cancel)="onCancel($event)"
+    (reissue)="onReissue($event)"
+    (revoke)="onRevoke($event)"
+    (undo)="onUndo($event)"
+    (clear)="onClear($event)"
+    (deleteAll)="onDeleteAll($event)"
+    (transfer)="onTransfer($event)"
+    (createPrtSet)="onCreatePrtSet($event)"
+    (linkToPrtSet)="onLinkToPrtSet($event)"
+    (back)="onBack($event)"
     (rowSelect)="onRowSelect($event)"
+    (changePage)="onChangePage($event)"
     ></ng2-smart-table>
   `,
 })
@@ -22,16 +32,19 @@ export class BasicExampleDataComponent {
   settings = {
     actions: {
       columnTitle: 'Actions',
-      add: false,
+      add: true,
       edit: true,
       delete: true,
+      reissue : false,
+      revoked : false,
+      undo : false,
       custom: [],
       position: 'left', // left|right
     },
     bottomActions: {
       enabled: true,
       add: {
-        enabled: true,
+        enabled: false,
         content: 'Add New',
       },
     },
@@ -39,6 +52,9 @@ export class BasicExampleDataComponent {
     columns: {
       id: {
         title: 'ID',
+        validators: [Validators.required,
+        Validators.minLength(1)
+        ]
       },
       name: {
         title: 'Full Name',
@@ -1948,6 +1964,79 @@ export class BasicExampleDataComponent {
       }
     }
   }
+
+  onReissue(event) {
+    console.log(event);
+    if (window.confirm('Are you sure you want to reissue?')) {
+      event.reissue.resolve();
+    } else {
+      event.reissue.reject();
+    }
+  }
+
+  onRevoke(event) {
+    console.log(event);
+    if (window.confirm('Are you sure you want to revoke?')) {
+      event.revoke.resolve();
+    } else {
+      event.revoke.reject();
+    }
+  }
+
+  onUndo(event) {
+    console.log(event);
+    if (window.confirm('Are you sure you want to undo?')) {
+      event.undo.resolve();
+    } else {
+      event.undo.reject();
+    }
+  }
+
+  onClear(event) {
+    if (window.confirm('Are you sure you want to clear?')) {
+      event.undo.resolve();
+    } else {
+      event.undo.reject();
+    }
+  }
+  onDeleteAll(event) {
+    if (window.confirm('Are you sure you want to deleteall?')) {
+      event.undo.resolve();
+    } else {
+      event.undo.reject();
+    }
+  }
+  onTransfer(event) {
+    if (window.confirm('Are you sure you want to transfer?')) {
+      event.undo.resolve();
+    } else {
+      event.undo.reject();
+    }
+  }
+  onCreatePrtSet(event) {
+    if (window.confirm('Are you sure you want to CreatePrtSet?')) {
+      event.undo.resolve();
+    } else {
+      event.undo.reject();
+    }
+  }
+  onLinkToPrtSet(event) {
+    if (window.confirm('Are you sure you want to LinkToPrtSet?')) {
+      event.undo.resolve();
+    } else {
+      event.undo.reject();
+    }
+  }
+  onBack(event) {
+    if (window.confirm('Are you sure you want to go back?')) {
+      event.undo.resolve();
+    } else {
+      event.undo.reject();
+    }
+  }
+
+
+
   onCancelUpdate(event) {
     console.log(event);
   }
@@ -1973,4 +2062,13 @@ export class BasicExampleDataComponent {
   onRowSelect(event) {
     console.log(event);
   }
+
+  onChangePage(event) {
+    if (window.confirm('Are you sure you want to Navigate?')) {
+      event.changePage.resolve();
+    } else {
+      event.changePage.reject();
+    }
+  }
+
 }

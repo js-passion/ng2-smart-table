@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 import { Grid } from '../../../lib/grid';
 
@@ -10,13 +10,14 @@ import { Grid } from '../../../lib/grid';
         (click)="$event.preventDefault();create.emit($event)"></a>
     <a href="#" class="ng2-smart-action ng2-smart-action-add-cancel"
         [innerHTML]="cancelButtonContent"
-        (click)="$event.preventDefault();grid.createFormShown = false;"></a>
+        (click)="onAddCancel($event)"></a>
   `,
 })
 export class ActionsComponent implements OnChanges {
 
   @Input() grid: Grid;
   @Output() create = new EventEmitter<any>();
+  @Output() addCancel = new EventEmitter<any>();
 
   createButtonContent: string;
   cancelButtonContent: string;
@@ -24,5 +25,12 @@ export class ActionsComponent implements OnChanges {
   ngOnChanges() {
     this.createButtonContent = this.grid.getSetting('add.createButtonContent');
     this.cancelButtonContent = this.grid.getSetting('add.cancelButtonContent');
+  }
+
+  onAddCancel(event : any) {
+    event.preventDefault();
+    this.grid.createFormShown = false;
+    this.grid.dataSet.newRowValidator.reset();
+    this.addCancel.emit();
   }
 }

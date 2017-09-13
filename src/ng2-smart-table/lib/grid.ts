@@ -7,6 +7,7 @@ import { Column } from './data-set/column';
 import { Row } from './data-set/row';
 import { DataSet } from './data-set/data-set';
 import { DataSource } from './data-source/data-source';
+import { ValidatorService } from './validator.service';
 
 export class Grid {
 
@@ -15,11 +16,12 @@ export class Grid {
   source: DataSource;
   settings: any;
   dataSet: DataSet;
+  deletedIndex: number;
 
   onSelectRowSource = new Subject<any>();
 
-  constructor(source: DataSource, settings: any) {
-    this.setSettings(settings);
+  constructor(source: DataSource, settings: any, validator: ValidatorService) {
+    this.setSettings(settings, validator);
     this.setSource(source);
   }
 
@@ -43,9 +45,103 @@ export class Grid {
     return this.dataSet.newRow;
   }
 
-  setSettings(settings: Object) {
+
+  toggleCheckBoxOnCancel() {
+    let rows = [];
+    const page = this.source.getPaging().page;
+    const perPage = this.source.getPaging().perPage;
+    rows = this.dataSet.getRows().slice(0, 10);
+    let isEditable = false;
+    for (const row of rows) {
+      if (row.isDeleted || row.isInEditing || row.isReissued || row.isRevoked || row.isUndo) {
+        isEditable = true;
+      }
+    }
+    if (!isEditable) {
+      for (const row of rows) {
+        row.disableCheckBox = false;
+      }
+    }
+
+  }
+  disableCheckBoxes() {
+    const rows = this.dataSet.getRows().slice(0, 10);
+    for (let row of rows) {
+      row.isSelected = false;
+      row.disableCheckBox = true;
+    }
+  }
+
+
+  toggleSorting(toggleOn: boolean) {
+    const columns = this.dataSet.getColumns();
+    for (const column of columns) {
+      if (toggleOn) {
+        column.isSortable = true;
+      } else {
+        column.isSortable = false;
+      }
+    }
+  }
+
+  toggleFiltering(toggleOn: boolean) {
+    const columns = this.dataSet.getColumns();
+    for (const column of columns) {
+      if (toggleOn) {
+        column.isFilterable = true;
+      } else {
+        column.isFilterable = false;
+      }
+    }
+  }
+
+  toggleFilteringOnCancel() {
+    let rows = [];
+    const page = this.source.getPaging().page;
+    const perPage = this.source.getPaging().perPage;
+    rows = this.dataSet.getRows().slice(0, 10);
+    let isEditable = false;
+    for (const row of rows) {
+      if (row.isDeleted || row.isInEditing || row.isReissued || row.isRevoked || row.isUndo) {
+        isEditable = true;
+      }
+    }
+    if (!isEditable) {
+      this.toggleFiltering(true);
+    }
+  }
+
+  toggleSortingOnCancel() {
+    let rows = [];
+    const page = this.source.getPaging().page;
+    const perPage = this.source.getPaging().perPage;
+    rows = this.dataSet.getRows().slice(0, 10);
+    let isEditable = false;
+    for (const row of rows) {
+      if (row.isDeleted || row.isInEditing || row.isReissued || row.isRevoked || row.isUndo) {
+        isEditable = true;
+      }
+    }
+    if (!isEditable) {
+      this.toggleSorting(true);
+    }
+
+  }
+
+  enableEditDelete(data: Object) {
+    const row = this.dataSet.findRowByData(data);
+    this.dataSet.findRowByData(data).isDeleted = false;
+    this.dataSet.findRowByData(data).isInEditing = false;
+    this.dataSet.findRowByData(data).isReissued = false;
+    this.dataSet.findRowByData(data).isRevoked = false;
+    this.dataSet.findRowByData(data).isUndo = false;
+    row.disableCheckBox = false;
+    this.settings.actions.delete = false;
+  }
+
+  setSettings(settings: Object, validator: ValidatorService) {
     this.settings = settings;
-    this.dataSet = new DataSet([], this.getSetting('columns'));
+    this.dataSet = new DataSet([], this.getSetting('columns'), validator);
 
     if (this.source) {
       this.source.refresh();
@@ -54,6 +150,34 @@ export class Grid {
 
   getDataSet(): DataSet {
     return this.dataSet;
+  }
+
+  getAllRecords(): any[] {
+    let rows = this.getRows();
+    let records: any[] = [];
+    let pushRecord = false;
+    for (let row of rows) {
+      let record = {
+        data: {},
+        action: ''
+      };
+      if (row.isDeleted) {
+        record.action = 'DELETE';
+        pushRecord = true;
+      } else if (row.isInEditing && !row.isNewRow) {
+        record.action = 'EDIT';
+        pushRecord = true;
+      } else if (row.isNewRow) {
+        record.action = 'ADD';
+        pushRecord = true;
+      }
+      if (pushRecord) {
+        record.data = row.getNewData();
+        records.push(record);
+      }
+      pushRecord = false;
+    }
+    return records;
   }
 
   setSource(source: DataSource) {
@@ -105,8 +229,8 @@ export class Grid {
       } else {
         this.source.prepend(newData).then(() => {
           this.createFormShown = false;
-          this.dataSet.createNewRow();
-        });
+          this.dataSet.addInsertedRowValidator();
+        })
       }
     }).catch((err) => {
       // doing nothing
@@ -117,9 +241,13 @@ export class Grid {
         newData: row.getNewData(),
         source: this.source,
         confirm: deferred,
+        validator: this.dataSet.newRowValidator,
       });
     } else {
-      deferred.resolve();
+      if (this.dataSet.newRowValidator.invalid)
+        deferred.reject();
+      else
+        deferred.resolve();
     }
   }
 
@@ -133,6 +261,7 @@ export class Grid {
       } else {
         this.source.update(row.getData(), newData).then(() => {
           row.isInEditing = false;
+          this.dataSet.addInsertedRowValidator();
         });
       }
     }).catch((err) => {
@@ -145,20 +274,30 @@ export class Grid {
         newData: row.getNewData(),
         source: this.source,
         confirm: deferred,
+        validator: this.dataSet.newRowValidator,
       });
     } else {
-      deferred.resolve();
+      if (this.dataSet.newRowValidator.invalid)
+        deferred.reject();
+      else
+        deferred.resolve();
     }
   }
 
+  deleteNewRow(data: any, index: any) {
+    let row = this.dataSet.findRowByData(data);
+    if (row.isNewRow) {
+      this.source.remove(row.getData());
+      this.deletedIndex = index;
+    }
+  }
   delete(row: Row, confirmEmitter: EventEmitter<any>) {
 
     const deferred = new Deferred();
     deferred.promise.then(() => {
-      if (this.getSetting('mode') === 'custom') {
-        row.isDeleted = true;
-      } else {
+      if (this.getSetting('mode') !== 'custom') {
         this.source.remove(row.getData());
+        this.dataSet.editRowValidators = this.dataSet.editRowValidators.splice(row.index, 1);
       }
     }).catch((err) => {
       // doing nothing
@@ -176,13 +315,62 @@ export class Grid {
   }
 
   processDataChange(changes: any) {
+    let event = changes;
+    let index = 0;
     if (this.shouldProcessChange(changes)) {
+      const rows = this.dataSet.getRows().slice(0, 10);
       this.dataSet.setData(changes['elements']);
+      const newRows = this.dataSet.getRows().slice(0, 10);
+      if (['remove'].indexOf(changes['action']) !== -1) {
+        let oldIndex = 0;
+        // restore old status of rows because when data set changes new rows are created 
+        // from scratch and we lose the old status, hence copying the old status into newly created rows.
+        for (let index = 0; index < 9; index++) {
+          if (oldIndex === this.deletedIndex) {
+            oldIndex = oldIndex + 1;
+          }
+          newRows[index].isDeleted = rows[oldIndex].isDeleted;
+          newRows[index].isInEditing = rows[oldIndex].isInEditing;
+          newRows[index].isReissued = rows[oldIndex].isReissued;
+          newRows[index].isRevoked = rows[oldIndex].isRevoked;
+          newRows[index].isUndo = rows[oldIndex].isUndo;
+          newRows[index].isSelected = rows[index].isSelected;
+          newRows[index].disableCheckBox = rows[oldIndex].disableCheckBox;
+          newRows[index].isNewRow = rows[oldIndex].isNewRow;
+          oldIndex++;
+        }
+      } else {
+        if ((newRows.length > 0) && (rows.length > 0)) {
+          // restore old status of rows because when data set changes new rows are created 
+          // from scratch and we lose the old status, hence copying the old status into newly created rows.
+          while (index < 9) {
+            if (newRows[index + 1].isNewRow) {
+              newRows[index + 1].isInEditing = true;
+            }
+            newRows[index + 1].isDeleted = rows[index].isDeleted;
+            // if (newRows[index + 1].isDeleted) {
+            //   this.settings.actions.delete = true;
+            // }
+            newRows[index + 1].isInEditing = rows[index].isInEditing;
+            newRows[index + 1].isNewRow = rows[index].isNewRow;
+            newRows[index + 1].isReissued = rows[index].isReissued;
+            newRows[index + 1].isRevoked = rows[index].isRevoked;
+            newRows[index + 1].isUndo = rows[index].isUndo;
+            newRows[index + 1].isSelected = rows[index].isSelected;
+            newRows[index + 1].disableCheckBox = rows[index].disableCheckBox;
+
+            index++;
+          }
+          newRows[0].isInEditing = true;
+          newRows[0].isNewRow = true;
+          newRows[0].disableCheckBox = true;
+          newRows[0].isSelected = false;
+        }
+      }
       if (this.getSetting('selectMode') !== 'multi') {
         const row = this.determineRowToSelect(changes);
-
         if (row) {
-          this.onSelectRowSource.next(row);
+          this.onSelectRowSource.next(newRows[0]);
         }
       }
     }
@@ -194,7 +382,6 @@ export class Grid {
     } else if (['prepend', 'append'].indexOf(changes['action']) !== -1 && !this.getSetting('pager.display')) {
       return true;
     }
-
     return false;
   }
 

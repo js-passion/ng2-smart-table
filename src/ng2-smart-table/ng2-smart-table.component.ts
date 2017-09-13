@@ -3,8 +3,9 @@ import { Component, Input, Output, SimpleChange, EventEmitter, OnChanges } from 
 import { Grid } from './lib/grid';
 import { DataSource } from './lib/data-source/data-source';
 import { Row } from './lib/data-set/row';
-import { deepExtend } from './lib/helpers';
+import { Deferred, deepExtend } from './lib/helpers';
 import { LocalDataSource } from './lib/data-source/local/local.data-source';
+import { ValidatorService } from './lib/validator.service';
 
 @Component({
   selector: 'ng2-smart-table',
@@ -31,6 +32,16 @@ export class Ng2SmartTableComponent implements OnChanges {
   @Output() cancel = new EventEmitter<any>();
   @Output() refresh = new EventEmitter<any>();
   @Output() save = new EventEmitter<any>();
+  @Output() changePage = new EventEmitter<any>();
+  @Output() revoke = new EventEmitter<any>();
+  @Output() undo = new EventEmitter<any>();
+  @Output() reissue = new EventEmitter<any>();
+  @Output() clear = new EventEmitter<any>();
+  @Output() deleteAll = new EventEmitter<any>();
+  @Output() transfer = new EventEmitter<any>();
+  @Output() createPrtSet = new EventEmitter<any>();
+  @Output() linkToPrtSet = new EventEmitter<any>();
+  @Output() back = new EventEmitter<any>();
 
   tableClass: string;
   tableId: string;
@@ -40,18 +51,23 @@ export class Ng2SmartTableComponent implements OnChanges {
   rowClassFunction: Function;
   isBottomAction: boolean;
 
+  constructor(private validator: ValidatorService) { }
+
 
   grid: Grid;
   defaultSettings: Object = {
     mode: 'inline', // inline|external|click-to-edit
-    selectMode: 'single', // single|multi
+    selectMode: 'multi', // single|multi
     hideHeader: false,
     hideSubHeader: false,
     actions: {
       columnTitle: 'Actions',
-      add: true,
-      edit: true,
+      add: false,
+      edit: false,
       delete: true,
+      reissue : false,
+      revoked : false,
+      undo : false,
       custom: [],
       position: 'left', // left|right
     },
@@ -72,7 +88,31 @@ export class Ng2SmartTableComponent implements OnChanges {
       cancel: {
         enabled: false,
         content: 'Cancel'
-      }
+      },
+      clear: {
+        enabled: false,
+        content: 'Clear'
+      },
+      deleteAll: {
+        enabled: false,
+        content: 'Delete All'
+      },
+      transfer: {
+        enabled: false,
+        content: 'Transfer'
+      },
+      createPrtSet: {
+        enabled: false,
+        content: 'Create PrtSet'
+      },
+      linkToPrtSet: {
+        enabled: false,
+        content: 'Link To PrtSet'
+      },
+      back: {
+        enabled: false,
+        content: 'Back'
+      },
     },
     filter: {
       inputClass: '',
@@ -86,7 +126,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     },
     add: {
       inputClass: '',
-      addButtonContent: 'Add New',
+      addButtonContent: '<Label for="id">Add New</Label>',
       createButtonContent: 'Create',
       cancelButtonContent: 'Cancel',
       confirmCreate: false,
@@ -95,6 +135,19 @@ export class Ng2SmartTableComponent implements OnChanges {
       deleteButtonContent: 'Delete',
       confirmDelete: false,
     },
+    revoke: {
+      revokeButtonContent: 'Revoke',
+      cancelButtonContent: 'Cancel',
+    },
+    undo: {
+      undoButtonContent: 'Undo',
+      cancelButtonContent: 'Cancel',
+    },
+    reissue : {
+      reissueButtonContent: 'Reissue',
+      cancelButtonContent: 'Cancel',
+    },
+
     attr: {
       id: '',
       class: '',
@@ -110,10 +163,11 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   isAllSelected: boolean = false;
 
+
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if (this.grid) {
       if (changes['settings']) {
-        this.grid.setSettings(this.prepareSettings());
+        this.grid.setSettings(this.prepareSettings(), this.validator);
       }
       if (changes['source']) {
         this.source = this.prepareSource();
@@ -176,7 +230,7 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   initGrid() {
     this.source = this.prepareSource();
-    this.grid = new Grid(this.source, this.prepareSettings());
+    this.grid = new Grid(this.source, this.prepareSettings(), this.validator);
     this.grid.onSelectRow().subscribe((row) => this.emitSelectRow(row));
   }
 
@@ -194,8 +248,18 @@ export class Ng2SmartTableComponent implements OnChanges {
     return deepExtend({}, this.defaultSettings, this.settings);
   }
 
-  changePage($event: any) {
+  OnChangePage(event: any) {
+    const deferred = new Deferred();
     this.resetAllSelector();
+    deferred.promise.then((value) => {
+      this.source.setPage(event.page);
+    }).catch((err) => {
+      // do nothing
+    });
+    this.changePage.emit({
+      changePage: deferred,
+      page: event.page,
+    });
   }
 
   sort($event: any) {
@@ -206,9 +270,12 @@ export class Ng2SmartTableComponent implements OnChanges {
     this.resetAllSelector();
   }
   getColCount(): number {
-    let count:number = this.grid.getColumns().length;
+    let count: number = this.grid.getColumns().length;
 
     if (this.grid.isActionsVisible) {
+      count++;
+    }
+    if (this.grid.isMultiSelectVisible) {
       count++;
     }
     return count;
@@ -217,6 +284,8 @@ export class Ng2SmartTableComponent implements OnChanges {
    * TODO: add functionality
    */
   onSave() {
+    const rows = this.grid.getAllRecords();
+    console.log('rows updated - ',rows);
     this.save.emit();
   }
   /**
@@ -234,8 +303,234 @@ export class Ng2SmartTableComponent implements OnChanges {
   /**
    * TODO: add functionality
    */
-  onAdd() {
-    this.add.emit();
+  onAdd(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.toggleSortingOnCancel();
+      this.grid.toggleFilteringOnCancel();
+      this.grid.enableEditDelete(event.data);
+    });
+    this.add.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      add: deferred,
+    });
+    deferred.resolve();
+  }
+
+  onEdit(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.edit.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      edit: deferred,
+    });
+    deferred.resolve();
+  }
+
+  onDelete(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.delete.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      delete: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onUndo(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.undo.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      undo: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onRevoke(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.revoke.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      revoke: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onReissue(event : any){
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      this.grid.toggleSorting(false);
+      this.grid.toggleFiltering(false);
+      this.grid.disableCheckBoxes();
+    }).catch((err) => {
+      this.grid.enableEditDelete(event.data);
+    });
+    this.reissue.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      reissue: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onClear(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.clear.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      clear: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onDeleteAll(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.deleteAll.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      deleteAll: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onTransfer(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.transfer.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      transfer: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onBack(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.back.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      back: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onLinkToPrtSet(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.linkToPrtSet.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      linkToPrtSet: deferred,
+    });
+    deferred.resolve();
+  }
+
+  //TODO
+  onCreatePrtSet(event: any) {
+    const deferred = new Deferred();
+    deferred.promise.then((value) => {
+      //todo
+    }).catch((err) => {
+      //todo
+    });
+    this.createPrtSet.emit({
+      index: event.index,
+      data: event.data,
+      source: this.source,
+      createPrtSet: deferred,
+    });
+    deferred.resolve();
+  }
+
+
+  onAddCancel(event: any) {
+    this.grid.toggleSortingOnCancel();
+    this.grid.toggleFilteringOnCancel();
+  }
+
+  private onCancelUpdate(event: any) {
+    this.grid.toggleSortingOnCancel();
+    this.grid.toggleFilteringOnCancel();
+    this.grid.toggleCheckBoxOnCancel();
+    this.cancelUpdate.emit(event);
+    this.grid.deleteNewRow(event.data, event.index);
+
   }
 
   private resetAllSelector() {

@@ -62,7 +62,6 @@ export class PagerComponent implements OnChanges {
   }
 
   paginate(page: number): boolean {
-    this.source.setPage(page);
     this.page = page;
     this.changePage.emit({ page });
     return false;
