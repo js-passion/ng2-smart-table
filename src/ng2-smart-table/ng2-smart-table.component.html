@@ -20,43 +20,32 @@
       <th attr.colspan="{{ getColCount() }}" class="text-right">
         <div class="btn-group pull-right" role="group">
           <button *ngIf="grid.getSetting('bottomActions.add.enabled')" type="button" (click)="onAdd($event)">
-            <span class="glyphicon glyphicon-plus"></span>
-           
           </button>
           <button *ngIf="grid.getSetting('bottomActions.save.enabled')" type="button" class="btn btn-default" (click)="onSave($event)">
-            <span class="glyphicon glyphicon-saved"></span>
             {{ grid.getSetting('bottomActions.save.content') }}
           </button>
           <button *ngIf="grid.getSetting('bottomActions.refresh.enabled')" type="button" class="btn btn-default" (click)="onRefresh($event)">
-            <span class="glyphicon glyphicon-refresh"></span>
             {{ grid.getSetting('bottomActions.refresh.content') }}
           </button>
           <button *ngIf="grid.getSetting('bottomActions.cancel.enabled')" type="button" class="btn btn-secondary" (click)="onCancel($event)">
-            <span class="glyphicon glyphicon-remove"></span>
             {{ grid.getSetting('bottomActions.cancel.content') }}
           </button>
           <button *ngIf="grid.getSetting('bottomActions.clear.enabled')" type="button" class="btn btn-secondary" (click)="onClear($event)">
-          <span class="glyphicon glyphicon-remove"></span>
           {{ grid.getSetting('bottomActions.clear.content') }}
         </button>
           <button *ngIf="grid.getSetting('bottomActions.deleteAll.enabled')" type="button" class="btn btn-secondary" (click)="onDeleteAll($event)">
-        <span class="glyphicon glyphicon-remove"></span>
         {{ grid.getSetting('bottomActions.deleteAll.content') }}
       </button>
           <button *ngIf="grid.getSetting('bottomActions.transfer.enabled')" type="button" class="btn btn-secondary" (click)="onTransfer($event)">
-      <span class="glyphicon glyphicon-remove"></span>
       {{ grid.getSetting('bottomActions.transfer.content') }}
     </button>
           <button *ngIf="grid.getSetting('bottomActions.createPrtSet.enabled')" type="button" class="btn btn-secondary" (click)="onCreatePrtSet($event)">
-      <span class="glyphicon glyphicon-remove"></span>
       {{ grid.getSetting('bottomActions.createPrtSet.content') }}
     </button>
           <button *ngIf="grid.getSetting('bottomActions.linkToPrtSet.enabled')" type="button" class="btn btn-secondary" (click)="onLinkToPrtSet($event)">
-      <span class="glyphicon glyphicon-remove"></span>
       {{ grid.getSetting('bottomActions.linkToPrtSet.content') }}
     </button>
     <button *ngIf="grid.getSetting('bottomActions.back.enabled')" type="button" class="btn btn-secondary" (click)="onBack($event)">
-      <span class="glyphicon glyphicon-remove"></span>
       {{ grid.getSetting('bottomActions.back.content') }}
     </button>
         </div>

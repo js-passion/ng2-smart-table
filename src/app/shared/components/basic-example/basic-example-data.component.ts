@@ -44,7 +44,7 @@ export class BasicExampleDataComponent {
     bottomActions: {
       enabled: true,
       add: {
-        enabled: true,
+        enabled: false,
         content: 'Add New',
       },
     },
