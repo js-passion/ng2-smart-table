@@ -27,6 +27,9 @@ export class TbodyEditDeleteComponent implements OnChanges {
 
   isActionEdit: boolean;
   isActionDelete: boolean;
+  isActionUndo : boolean;
+  isActionReissue : boolean;
+  isActionRevoked : boolean;
   editRowButtonContent: string;
   deleteRowButtonContent: string;
   revokeRowButtonContent: string;
@@ -153,6 +156,9 @@ export class TbodyEditDeleteComponent implements OnChanges {
   ngOnChanges() {
     this.isActionEdit = this.grid.getSetting('actions.edit');
     this.isActionDelete = this.grid.getSetting('actions.delete');
+    this.isActionUndo = this.grid.getSetting('actions.undo');
+    this.isActionReissue = this.grid.getSetting('actions.reissue');
+    this.isActionRevoked = this.grid.getSetting('actions.revoked');
     this.editRowButtonContent = this.grid.getSetting('edit.editButtonContent');
     this.deleteRowButtonContent = this.grid.getSetting('delete.deleteButtonContent');
     this.revokeRowButtonContent = this.grid.getSetting('revoke.revokeButtonContent');

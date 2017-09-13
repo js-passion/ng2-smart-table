@@ -35,6 +35,9 @@ export class BasicExampleDataComponent {
       add: true,
       edit: true,
       delete: true,
+      reissue : false,
+      revoked : false,
+      undo : false,
       custom: [],
       position: 'left', // left|right
     },
