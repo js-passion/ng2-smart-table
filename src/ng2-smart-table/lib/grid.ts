@@ -348,9 +348,9 @@ export class Grid {
               newRows[index + 1].isInEditing = true;
             }
             newRows[index + 1].isDeleted = rows[index].isDeleted;
-            if (newRows[index + 1].isDeleted) {
-              this.settings.actions.delete = true;
-            }
+            // if (newRows[index + 1].isDeleted) {
+            //   this.settings.actions.delete = true;
+            // }
             newRows[index + 1].isInEditing = rows[index].isInEditing;
             newRows[index + 1].isNewRow = rows[index].isNewRow;
             newRows[index + 1].isReissued = rows[index].isReissued;

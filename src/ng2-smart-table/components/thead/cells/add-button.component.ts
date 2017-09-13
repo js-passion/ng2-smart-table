@@ -6,7 +6,8 @@ import { DataSource } from '../../../lib/data-source/data-source';
 @Component({
   selector: '[ng2-st-add-button]',
   template: `
-    <button *ngIf="isActionAdd"  class="ng2-smart-action ng2-smart-action-add-add" type="button"
+    
+    <button *ngIf="isActionAdd"  id="add" class="btn btn-secondary" type="button"
         [innerHTML]="addNewButtonContent" (click)="onAdd($event)"></button>
   `,
 })

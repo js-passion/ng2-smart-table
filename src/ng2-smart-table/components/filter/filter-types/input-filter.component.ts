@@ -15,7 +15,7 @@ import { DefaultFilter } from './default-filter';
            [formControl]="inputControl"
            class="form-control"
            type="text"
-           placeholder="search {{ column.title | lowercase}}" />
+           placeholder="Search {{ column.title}}" />
   `,
 })
 export class InputFilterComponent extends DefaultFilter implements OnInit {

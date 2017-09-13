@@ -126,7 +126,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     },
     add: {
       inputClass: '',
-      addButtonContent: '<span class="glyphicon glyphicon-plus"></span>',
+      addButtonContent: '<Label for="id">Add New</Label>',
       createButtonContent: 'Create',
       cancelButtonContent: 'Cancel',
       confirmCreate: false,
