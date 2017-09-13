@@ -285,6 +285,7 @@ export class Ng2SmartTableComponent implements OnChanges {
    */
   onSave() {
     const rows = this.grid.getAllRecords();
+    console.log('rows updated - ',rows);
     this.save.emit();
   }
   /**
