@@ -47,16 +47,13 @@ export class PagerComponent implements OnChanges ,OnInit{
         this.dataChangedSub.unsubscribe();
       }
       this.dataChangedSub = this.source.onChanged().subscribe((dataChanges) => {
-        // this.page = this.source.getPaging().page;
-        // this.perPage = this.source.getPaging().perPage;
-        // this.count = this.source.count();
-        this.page = changes.source.currentValue.pagingConf.page;
-        this.perPage = changes.source.currentValue.pagingConf.perPage;
-        this.count = changes.source.currentValue.data.length;
+        this.page = this.source.getPaging().page;
+        this.perPage = this.source.getPaging().perPage;
+        this.count = this.source.count();
+        this.control.setValue(this.page);
         if (this.isPageOutOfBounce()) {
           this.source.setPage(--this.page);
         }
-
         this.processPageChange(dataChanges);
         this.initPages();
       });
