@@ -17,7 +17,6 @@ export class Grid {
   settings: any;
   dataSet: DataSet;
   deletedIndex: number;
-
   onSelectRowSource = new Subject<any>();
 
   constructor(source: DataSource, settings: any, validator: ValidatorService) {
@@ -44,7 +43,6 @@ export class Grid {
   getNewRow(): Row {
     return this.dataSet.newRow;
   }
-
 
   toggleCheckBoxOnCancel() {
     let rows = [];
@@ -183,8 +181,9 @@ export class Grid {
   setSource(source: DataSource) {
     this.source = this.prepareSource(source);
 
-    this.source.onChanged().subscribe((changes) => this.processDataChange(changes));
-
+    this.source.onChanged().subscribe((changes) => {
+      this.processDataChange(changes);
+    });
     this.source.onUpdated().subscribe((data) => {
       const changedRow = this.dataSet.findRowByData(data);
       changedRow.setData(data);
@@ -221,34 +220,39 @@ export class Grid {
 
   create(row: Row, confirmEmitter: EventEmitter<any>) {
 
-    const deferred = new Deferred();
-    deferred.promise.then((newData) => {
-      newData = newData ? newData : row.getNewData();
-      if (deferred.resolve.skipAdd) {
-        this.createFormShown = false;
-      } else {
-        this.source.prepend(newData).then(() => {
-          this.createFormShown = false;
-          this.dataSet.addInsertedRowValidator();
-        })
-      }
-    }).catch((err) => {
-      // doing nothing
-    });
+    // const deferred = new Deferred();
+    // deferred.promise.then((newData) => {
+    //   newData = newData ? newData : row.getNewData();
+    //   if (deferred.resolve.skipAdd) {
+    //     this.createFormShown = false;
+    //   } else {
+    //     this.source.prepend(newData).then(() => {
+    //       this.createFormShown = false;
+    //       this.dataSet.addInsertedRowValidator();
+    //     })
+    //   }
+    // }).catch((err) => {
+    //   // doing nothing
+    // });
 
-    if (this.getSetting('add.confirmCreate')) {
-      confirmEmitter.emit({
-        newData: row.getNewData(),
-        source: this.source,
-        confirm: deferred,
-        validator: this.dataSet.newRowValidator,
-      });
-    } else {
-      if (this.dataSet.newRowValidator.invalid)
-        deferred.reject();
-      else
-        deferred.resolve();
-    }
+    // if (this.getSetting('add.confirmCreate')) {
+    //   confirmEmitter.emit({
+    //     newData: row.getNewData(),
+    //     source: this.source,
+    //     confirm: deferred,
+    //     validator: this.dataSet.newRowValidator,
+    //   });
+    // } else {
+    //   if (this.dataSet.newRowValidator.invalid)
+    //     deferred.reject();
+    //   else
+    //     deferred.resolve();
+    // }
+    let newData = {};
+    this.source.prepend(newData).then(() => {
+            this.createFormShown = false;
+            this.dataSet.addInsertedRowValidator();
+          })
   }
 
   save(row: Row, confirmEmitter: EventEmitter<any>) {
@@ -291,6 +295,17 @@ export class Grid {
       this.deletedIndex = index;
     }
   }
+
+
+  deleteNewRows(){
+    let rows = this.getRows();
+    for(const row of rows){
+      if(row.isNewRow){
+        this.source.remove(row.getData());
+      }
+    }
+  }
+
   delete(row: Row, confirmEmitter: EventEmitter<any>) {
 
     const deferred = new Deferred();
@@ -339,7 +354,9 @@ export class Grid {
           newRows[index].isNewRow = rows[oldIndex].isNewRow;
           oldIndex++;
         }
-      } else {
+      } 
+
+      if (['prepend', 'append'].indexOf(changes['action']) !== -1){ 
         if ((newRows.length > 0) && (rows.length > 0)) {
           // restore old status of rows because when data set changes new rows are created 
           // from scratch and we lose the old status, hence copying the old status into newly created rows.
@@ -367,6 +384,7 @@ export class Grid {
           newRows[0].isSelected = false;
         }
       }
+      
       if (this.getSetting('selectMode') !== 'multi') {
         const row = this.determineRowToSelect(changes);
         if (row) {
@@ -379,7 +397,7 @@ export class Grid {
   shouldProcessChange(changes: any): boolean {
     if (['filter', 'sort', 'page', 'remove', 'refresh', 'load', 'paging'].indexOf(changes['action']) !== -1) {
       return true;
-    } else if (['prepend', 'append'].indexOf(changes['action']) !== -1 && !this.getSetting('pager.display')) {
+    } else if (['prepend', 'append'].indexOf(changes['action']) !== -1) {
       return true;
     }
     return false;

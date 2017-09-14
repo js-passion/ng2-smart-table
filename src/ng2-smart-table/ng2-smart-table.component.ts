@@ -50,7 +50,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   isPagerDisplay: boolean;
   rowClassFunction: Function;
   isBottomAction: boolean;
-
+  public pageNumber : number;
   constructor(private validator: ValidatorService) { }
 
 
@@ -65,9 +65,9 @@ export class Ng2SmartTableComponent implements OnChanges {
       add: false,
       edit: false,
       delete: true,
-      reissue : false,
-      revoked : false,
-      undo : false,
+      reissue: false,
+      revoked: false,
+      undo: false,
       custom: [],
       position: 'left', // left|right
     },
@@ -143,7 +143,7 @@ export class Ng2SmartTableComponent implements OnChanges {
       undoButtonContent: 'Undo',
       cancelButtonContent: 'Cancel',
     },
-    reissue : {
+    reissue: {
       reissueButtonContent: 'Reissue',
       cancelButtonContent: 'Cancel',
     },
@@ -250,16 +250,25 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   OnChangePage(event: any) {
     const deferred = new Deferred();
-    this.resetAllSelector();
-    deferred.promise.then((value) => {
-      this.source.setPage(event.page);
-    }).catch((err) => {
-      // do nothing
-    });
-    this.changePage.emit({
-      changePage: deferred,
-      page: event.page,
-    });
+      this.resetAllSelector();
+      deferred.promise.then((value) => {
+        this.grid.toggleFiltering(true);
+        this.grid.toggleSorting(true);
+        this.source.setPage(event.page);
+        this.grid.toggleFiltering(true);
+        this.grid.toggleSorting(true);
+        this.pageNumber = event.page;
+        this.grid.deleteNewRows();
+        this.validator.notifyOther(this.pageNumber);
+      }).catch((err) => {
+        // do nothing
+        this.pageNumber = -1;
+        this.validator.notifyOther(this.pageNumber);
+      });
+      this.changePage.emit({
+        changePage: deferred,
+        page: event.page,
+      });
   }
 
   sort($event: any) {
@@ -285,7 +294,6 @@ export class Ng2SmartTableComponent implements OnChanges {
    */
   onSave() {
     const rows = this.grid.getAllRecords();
-    console.log('rows updated - ',rows);
     this.save.emit();
   }
   /**
@@ -398,7 +406,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   }
 
   //TODO
-  onReissue(event : any){
+  onReissue(event: any) {
     const deferred = new Deferred();
     deferred.promise.then((value) => {
       this.grid.toggleSorting(false);

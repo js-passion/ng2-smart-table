@@ -12,7 +12,7 @@
   <tfoot *ngIf="isPagerDisplay || isBottomAction">
     <tr>
       <th attr.colspan="{{ getColCount() }}">
-        <ng2-smart-table-pager [source]="source" (changePage)="OnChangePage($event)">
+        <ng2-smart-table-pager [source]="source" (changePage)="OnChangePage($event)" [pageNumber]="pageNumber">
         </ng2-smart-table-pager>
       </th>
     </tr>
