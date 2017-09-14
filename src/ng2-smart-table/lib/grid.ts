@@ -219,40 +219,11 @@ export class Grid {
   }
 
   create(row: Row, confirmEmitter: EventEmitter<any>) {
-
-    // const deferred = new Deferred();
-    // deferred.promise.then((newData) => {
-    //   newData = newData ? newData : row.getNewData();
-    //   if (deferred.resolve.skipAdd) {
-    //     this.createFormShown = false;
-    //   } else {
-    //     this.source.prepend(newData).then(() => {
-    //       this.createFormShown = false;
-    //       this.dataSet.addInsertedRowValidator();
-    //     })
-    //   }
-    // }).catch((err) => {
-    //   // doing nothing
-    // });
-
-    // if (this.getSetting('add.confirmCreate')) {
-    //   confirmEmitter.emit({
-    //     newData: row.getNewData(),
-    //     source: this.source,
-    //     confirm: deferred,
-    //     validator: this.dataSet.newRowValidator,
-    //   });
-    // } else {
-    //   if (this.dataSet.newRowValidator.invalid)
-    //     deferred.reject();
-    //   else
-    //     deferred.resolve();
-    // }
     let newData = {};
-    this.source.prepend(newData).then(() => {
-            this.createFormShown = false;
-            this.dataSet.addInsertedRowValidator();
-          })
+    let page = this.source.getPaging().page;
+    let perPage = this.source.getPaging().perPage;
+    let position = perPage * (page - 1);
+    this.source.insert(position, newData);
   }
 
   save(row: Row, confirmEmitter: EventEmitter<any>) {

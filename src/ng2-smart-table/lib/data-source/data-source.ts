@@ -46,6 +46,12 @@ export abstract class DataSource {
     return Promise.resolve();
   }
 
+  insert(position : number , element : any) : Promise<any> {
+    this.emitOnAdded(element);
+    this.emitOnChanged('prepend');
+    return Promise.resolve();
+  }
+
   append(element: any): Promise<any> {
     this.emitOnAdded(element);
     this.emitOnChanged('append');

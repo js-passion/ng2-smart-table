@@ -12,7 +12,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./pager.component.scss'],
   templateUrl: './pager.component.html',
 })
-export class PagerComponent implements OnChanges ,OnInit{
+export class PagerComponent implements OnChanges, OnInit {
 
   @Input() source: DataSource;
   @Input() pageNumber: number;
@@ -23,19 +23,19 @@ export class PagerComponent implements OnChanges ,OnInit{
   protected count: number = 0;
   protected perPage: number;
   private subscription: Subscription;
-  control : FormControl;
+  control: FormControl;
 
   protected dataChangedSub: Subscription;
-  constructor(private validator: ValidatorService){
-    this.control = new FormControl([]); 
+  constructor(private validator: ValidatorService) {
+    this.control = new FormControl([]);
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.subscription = this.validator.notifyObservable$.subscribe((page) => {
-      if(page !== -1){
+      if (page !== -1) {
         this.page = page;
         this.control.setValue(page);
-      }else{
+      } else {
         this.control.setValue(this.page);
       }
     });
