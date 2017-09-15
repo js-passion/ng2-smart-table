@@ -15,13 +15,11 @@
       <li>
         <span>
                     Page
-                    <select
-                    id="smart-table-pages"
-                    (change)="paginate($event.target.value)">
+                    <select  [formControl]="control"
+                    (change)="paginate($event.target.value)"
+                    id="smart-table-pages">
                       <option
                     *ngFor="let pageNumber of this.getPages()"
-                    [attr.value]="pageNumber"
-                    [selected]="pageNumber === getPage()"
                     >{{ pageNumber }}</option>
                 </select>
 

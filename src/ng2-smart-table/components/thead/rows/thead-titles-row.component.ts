@@ -11,7 +11,7 @@ import { Column } from "../../../lib/data-set/column";
                                    [grid]="grid"
                                    [source]="source"
                                    [isAllSelected]="isAllSelected"
-                                   (click)="selectAllRows.emit($event)">
+                                   (click)="selectAllRowsFunction($event)">
     </th>
     <th ng2-st-actions-title *ngIf="showActionColumnLeft" [grid]="grid"></th>
     <th *ngFor="let column of grid.getColumns()" class="ng2-smart-th {{ column.id }}" [ngClass]="column.class"
@@ -34,6 +34,18 @@ export class TheadTitlesRowComponent implements OnChanges {
   showActionColumnLeft: boolean;
   showActionColumnRight: boolean;
 
+  selectAllRowsFunction(event : any){
+    const rows = this.grid.getRows();
+    let isUpdateMode = false;
+    for(const row of rows){
+      if(row.disableCheckBox){
+        isUpdateMode = true;
+      }
+    }
+    if(!isUpdateMode){
+      this.selectAllRows.emit(event);
+    }
+  }
 
   ngOnChanges() {
     this.isMultiSelectVisible = this.grid.isMultiSelectVisible();

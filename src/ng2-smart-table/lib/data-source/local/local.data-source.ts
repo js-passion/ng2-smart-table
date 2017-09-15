@@ -34,6 +34,11 @@ export class LocalDataSource extends DataSource {
     return super.prepend(element);
   }
 
+  insert(position : number, element: any): Promise<any> {
+    this.data.splice(position , 0 , element);
+    return super.prepend(element);
+  }
+
   append(element: any): Promise<any> {
     this.reset(true);
 
