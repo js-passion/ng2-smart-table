@@ -303,18 +303,21 @@ export class Grid {
   processDataChange(changes: any) {
     let event = changes;
     let index = 0;
+    let perPage = this.source.getPaging().perPage;
     if (this.shouldProcessChange(changes)) {
-      const rows = this.dataSet.getRows().slice(0, 10);
+      
+      const rows = this.dataSet.getRows().slice(0, perPage);
       this.dataSet.setData(changes['elements']);
-      const newRows = this.dataSet.getRows().slice(0, 10);
+      const newRows = this.dataSet.getRows().slice(0, perPage);
       if (['remove'].indexOf(changes['action']) !== -1) {
         let oldIndex = 0;
         // restore old status of rows because when data set changes new rows are created 
         // from scratch and we lose the old status, hence copying the old status into newly created rows.
-        for (let index = 0; index < 9; index++) {
+        for (let index = 0; index < (perPage - 1); index++) {
           if (oldIndex === this.deletedIndex) {
             oldIndex = oldIndex + 1;
           }
+          if(newRows[index] && rows[oldIndex]){
           newRows[index].isDeleted = rows[oldIndex].isDeleted;
           newRows[index].isInEditing = rows[oldIndex].isInEditing;
           newRows[index].isReissued = rows[oldIndex].isReissued;
@@ -325,13 +328,15 @@ export class Grid {
           newRows[index].isNewRow = rows[oldIndex].isNewRow;
           oldIndex++;
         }
+      }
       } 
 
       if (['prepend', 'append'].indexOf(changes['action']) !== -1){ 
         if ((newRows.length > 0) && (rows.length > 0)) {
           // restore old status of rows because when data set changes new rows are created 
           // from scratch and we lose the old status, hence copying the old status into newly created rows.
-          while (index < 9) {
+          while (index < (perPage - 1)) {
+            if(rows[index]){
             if (newRows[index + 1].isNewRow) {
               newRows[index + 1].isInEditing = true;
             }
@@ -348,7 +353,10 @@ export class Grid {
             newRows[index + 1].disableCheckBox = rows[index].disableCheckBox;
 
             index++;
+          }else{
+            break;
           }
+        }
           newRows[0].isInEditing = true;
           newRows[0].isNewRow = true;
           newRows[0].disableCheckBox = true;
