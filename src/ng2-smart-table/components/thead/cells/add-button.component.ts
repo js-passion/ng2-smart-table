@@ -7,8 +7,8 @@ import { DataSource } from '../../../lib/data-source/data-source';
   selector: '[ng2-st-add-button]',
   template: `
     
-    <button *ngIf="isActionAdd"  id="add" class="btn btn-secondary" type="button"
-        [innerHTML]="addNewButtonContent" (click)="onAdd($event)"></button>
+    <button *ngIf="isActionAdd"  id="add" class="btn {{addNewButtonClass}}" type="button"
+    (click)="onAdd($event)">{{addNewButtonContent}}</button>
   `,
 })
 export class AddButtonComponent implements AfterViewInit, OnChanges {
@@ -19,6 +19,7 @@ export class AddButtonComponent implements AfterViewInit, OnChanges {
 
   isActionAdd: boolean;
   addNewButtonContent: string;
+  addNewButtonClass: string;
 
   constructor(private ref: ElementRef) {
   }
@@ -30,6 +31,7 @@ export class AddButtonComponent implements AfterViewInit, OnChanges {
   ngOnChanges() {
     this.isActionAdd = this.grid.getSetting('actions.add');
     this.addNewButtonContent = this.grid.getSetting('add.addButtonContent');
+    this.addNewButtonClass = this.grid.getSetting('add.class');
   }
 
   onAdd(event: any) {

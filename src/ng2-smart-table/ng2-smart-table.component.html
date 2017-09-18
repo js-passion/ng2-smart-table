@@ -19,34 +19,34 @@
     <tr *ngIf="isBottomAction">
       <th attr.colspan="{{ getColCount() }}" class="text-right">
         <div class="btn-group pull-right" role="group">
-          <button *ngIf="grid.getSetting('bottomActions.add.enabled')" type="button" (click)="onAdd($event)">
+          <button *ngIf="grid.getSetting('bottomActions.add.enabled')" class="btn {{ grid.getSetting('bottomActions.add.class') }}" type="button" (click)="onAdd($event)">
               {{ grid.getSetting('bottomActions.add.content') }}
           </button>
-          <button *ngIf="grid.getSetting('bottomActions.save.enabled')" type="button" class="btn btn-default" (click)="onSave($event)">
+          <button *ngIf="grid.getSetting('bottomActions.save.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.save.class') }}" (click)="onSave($event)">
             {{ grid.getSetting('bottomActions.save.content') }}
           </button>
-          <button *ngIf="grid.getSetting('bottomActions.refresh.enabled')" type="button" class="btn btn-default" (click)="onRefresh($event)">
+          <button *ngIf="grid.getSetting('bottomActions.refresh.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.refresh.class') }}" (click)="onRefresh($event)">
             {{ grid.getSetting('bottomActions.refresh.content') }}
           </button>
-          <button *ngIf="grid.getSetting('bottomActions.cancel.enabled')" type="button" class="btn btn-secondary" (click)="onCancel($event)">
+          <button *ngIf="grid.getSetting('bottomActions.cancel.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.cancel.class') }}" (click)="onCancel($event)">
             {{ grid.getSetting('bottomActions.cancel.content') }}
           </button>
-          <button *ngIf="grid.getSetting('bottomActions.clear.enabled')" type="button" class="btn btn-secondary" (click)="onClear($event)">
+          <button *ngIf="grid.getSetting('bottomActions.clear.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.clear.class') }}" (click)="onClear($event)">
           {{ grid.getSetting('bottomActions.clear.content') }}
         </button>
-          <button *ngIf="grid.getSetting('bottomActions.deleteAll.enabled')" type="button" class="btn btn-secondary" (click)="onDeleteAll($event)">
+          <button *ngIf="grid.getSetting('bottomActions.deleteAll.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.deleteAll.class') }}" (click)="onDeleteAll($event)">
         {{ grid.getSetting('bottomActions.deleteAll.content') }}
       </button>
-          <button *ngIf="grid.getSetting('bottomActions.transfer.enabled')" type="button" class="btn btn-secondary" (click)="onTransfer($event)">
+          <button *ngIf="grid.getSetting('bottomActions.transfer.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.transfer.class') }}" (click)="onTransfer($event)">
       {{ grid.getSetting('bottomActions.transfer.content') }}
     </button>
-          <button *ngIf="grid.getSetting('bottomActions.createPrtSet.enabled')" type="button" class="btn btn-secondary" (click)="onCreatePrtSet($event)">
+          <button *ngIf="grid.getSetting('bottomActions.createPrtSet.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.createPrtSet.class') }}" (click)="onCreatePrtSet($event)">
       {{ grid.getSetting('bottomActions.createPrtSet.content') }}
     </button>
-          <button *ngIf="grid.getSetting('bottomActions.linkToPrtSet.enabled')" type="button" class="btn btn-secondary" (click)="onLinkToPrtSet($event)">
+          <button *ngIf="grid.getSetting('bottomActions.linkToPrtSet.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.linkToPrtSet.class') }}" (click)="onLinkToPrtSet($event)">
       {{ grid.getSetting('bottomActions.linkToPrtSet.content') }}
     </button>
-    <button *ngIf="grid.getSetting('bottomActions.back.enabled')" type="button" class="btn btn-secondary" (click)="onBack($event)">
+    <button *ngIf="grid.getSetting('bottomActions.back.enabled')" type="button" class="btn  {{ grid.getSetting('bottomActions.back.class') }}" (click)="onBack($event)">
       {{ grid.getSetting('bottomActions.back.content') }}
     </button>
         </div>

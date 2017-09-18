@@ -75,43 +75,53 @@ export class Ng2SmartTableComponent implements OnChanges {
       enabled: false,
       add: {
         enabled: false,
-        content: 'Add'
+        content: 'Add',
+        class:''
       },
       save: {
         enabled: false,
-        content: 'Save'
+        content: 'Save',
+        class:''
       },
       refresh: {
         enabled: false,
-        content: 'Refresh'
+        content: 'Refresh',
+        class:''
       },
       cancel: {
         enabled: false,
-        content: 'Cancel'
+        content: 'Cancel',
+        class:''
       },
       clear: {
         enabled: false,
-        content: 'Clear'
+        content: 'Clear',
+        class:''
       },
       deleteAll: {
         enabled: false,
-        content: 'Delete All'
+        content: 'Delete All',
+        class:''
       },
       transfer: {
         enabled: false,
-        content: 'Transfer'
+        content: 'Transfer',
+        class:''
       },
       createPrtSet: {
         enabled: false,
-        content: 'Create PrtSet'
+        content: 'Create PrtSet',
+        class:''
       },
       linkToPrtSet: {
         enabled: false,
-        content: 'Link To PrtSet'
+        content: 'Link To PrtSet',
+        class:''
       },
       back: {
         enabled: false,
-        content: 'Back'
+        content: 'Back',
+        class:''
       },
     },
     filter: {
@@ -126,7 +136,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     },
     add: {
       inputClass: '',
-      addButtonContent: '<Label for="id">Add New</Label>',
+      addButtonContent: 'Add New',
       createButtonContent: 'Create',
       cancelButtonContent: 'Cancel',
       confirmCreate: false,
